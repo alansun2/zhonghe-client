@@ -12,7 +12,6 @@ import java.util.Map;
  * @date 2021/8/28 13:44
  */
 public class SyncResultSupport {
-    public static CountDownLatch2 downloadResultDataCountDown1 = new CountDownLatch2(1);
     public static CountDownLatch2 downloadResultDataCountDown = new CountDownLatch2(1);
 
     public static ResultInternal resultInternal;

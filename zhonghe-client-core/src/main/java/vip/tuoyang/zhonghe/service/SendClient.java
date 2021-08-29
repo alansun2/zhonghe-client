@@ -120,7 +120,7 @@ public class SendClient {
         }
         lock.lock();
         try {
-            SyncResultSupport.downloadResultDataCountDown1.reset();
+            SyncResultSupport.cmdResultCountDownMap.get(cmdEnum).reset();
             StringBuilder sb = new StringBuilder();
             // 0 1 2 固定
             sb.append("FEE0A7");
@@ -152,7 +152,7 @@ public class SendClient {
             log.info("cmd: [{}], para: [{}], 发送: [{}]", cmdEnum, para, sb.toString());
             getChannel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Objects.requireNonNull(ConvertCode.hexString2Bytes(sb.toString()))), inetSocketAddress));
             try {
-                SyncResultSupport.downloadResultDataCountDown1.await();
+                SyncResultSupport.cmdResultCountDownMap.get(cmdEnum).await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
