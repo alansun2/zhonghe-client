@@ -35,15 +35,15 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * test
      */
     @Override
-    public void test() {
-        SendClient.getSingleton().send(CmdEnum.TEST, "00", null);
+    public ZhongHeResult<?> test() {
+        return SendClient.getSingleton().send(CmdEnum.TEST, "00", null).toZhongHeResult();
     }
 
     /**
      * 初始化中间件
      */
     @Override
-    public void initMiddleWare() {
+    public ZhongHeResult<?> initMiddleWare() {
         // 先关闭
         this.close();
 
@@ -70,15 +70,15 @@ public class ZhongHeClientImpl implements ZhongHeClient {
         // 62 63
         sb.append("0000");
 
-        SendClient.getSingleton().send(CmdEnum.INIT, "00", sb.toString());
+        return SendClient.getSingleton().send(CmdEnum.INIT, "00", sb.toString()).toZhongHeResult();
     }
 
     /**
      * 关闭
      */
     @Override
-    public void close() {
-        SendClient.getSingleton().send(CmdEnum.CLOSE, "00", null);
+    public ZhongHeResult<?> close() {
+        return SendClient.getSingleton().send(CmdEnum.CLOSE, "00", null).toZhongHeResult();
     }
 
     //------------------------------------------task--------------------------------------------------------------------
@@ -89,10 +89,9 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * @param request {@link TaskRequest}
      */
     @Override
-    public void addTimingTask(TaskRequest request) {
+    public ZhongHeResult<String> addTimingTask(TaskRequest request) {
         final String generator = TimingFileTask.getInstance().generator("FE", request);
-
-        SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "01", generator);
+        return SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "01", generator.toUpperCase()).toZhongHeResult();
     }
 
     /**
@@ -102,10 +101,9 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * @param request {@link TaskRequest}
      */
     @Override
-    public void editTimingTask(String id, TaskRequest request) {
+    public ZhongHeResult<?> editTimingTask(String id, TaskRequest request) {
         final String generator = TimingFileTask.getInstance().generator(id, request);
-
-        SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "02", generator);
+        return SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "02", generator).toZhongHeResult();
     }
 
     /**
@@ -114,8 +112,19 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * @param id id
      */
     @Override
-    public void deleteTimingTask(String id) {
+    public ZhongHeResult<?> deleteTimingTask(String id, TaskRequest request) {
+        final String generator = TimingFileTask.getInstance().generator(id, request);
+        return SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "03", generator).toZhongHeResult();
+    }
 
+    /**
+     * 终止指定id的任务
+     *
+     * @param id id
+     */
+    @Override
+    public ZhongHeResult<?> abortTaskBySubId(String id) {
+        return SendClient.getSingleton().send(CmdEnum.ABORT_TASK_BY_SUB_ID, "00", ServiceUtils.changeOrder(id, 2)).toZhongHeResult();
     }
 
     //------------------------------download data----------------------------------------------------------------------------

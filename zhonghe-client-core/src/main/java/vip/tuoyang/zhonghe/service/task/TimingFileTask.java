@@ -26,7 +26,7 @@ public class TimingFileTask implements TaskGenerator {
     @Override
     public String generator(String id, TaskRequest request) {
 
-        return "000000" +
+        return "00000000" +
                 id + request.getTaskType() + "00" +
                 // timeType timeMode
                 request.getTime() +

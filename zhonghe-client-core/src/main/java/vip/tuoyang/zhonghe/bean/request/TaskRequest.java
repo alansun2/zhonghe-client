@@ -148,16 +148,21 @@ public class TaskRequest {
     }
 
     public String getTaskName() {
-        return ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(taskName));
+        final String s = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(taskName));
+        final String len = ConvertCode.intToHexString(s.length() / 2, 1);
+        return StringUtils.rightPad(len + s, 64, '0');
     }
 
     public String getStartTime() {
+        if (startTime == null) {
+            return "000000000000";
+        }
         return ServiceUtils.localDateTimeToHex(startTime);
     }
 
     public String getEndTime() {
         if (endTime == null) {
-            return "000000";
+            return "000000000000";
         }
         return ServiceUtils.localDateTimeToHex(endTime);
     }
@@ -175,7 +180,8 @@ public class TaskRequest {
         StringBuilder sb = new StringBuilder();
         final Set<Integer> weekIntSet = Arrays.stream(weekOption.split(SeparatorConstants.COMMA)).map(Integer::parseInt).collect(Collectors.toSet());
         final DayOfWeek[] values = DayOfWeek.values();
-        for (DayOfWeek value : values) {
+        for (int i = values.length - 1; i >= 0; i--) {
+            DayOfWeek value = values[i];
             if (weekIntSet.contains(value.getValue())) {
                 sb.append("1");
             } else {
@@ -183,7 +189,7 @@ public class TaskRequest {
             }
         }
 
-        return ConvertCode.binStr2HexString(sb.toString(), 1);
+        return ConvertCode.binStr2HexString(sb.append("0").toString(), 1);
     }
 
     public String getVolume() {
@@ -215,7 +221,7 @@ public class TaskRequest {
             return "00";
         }
 
-        return ConvertCode.intToHexString(playObjectIdList.size() + 1, 1);
+        return ConvertCode.intToHexString(playObjectIdList.size(), 1);
     }
 
     public String getPlayContent() {

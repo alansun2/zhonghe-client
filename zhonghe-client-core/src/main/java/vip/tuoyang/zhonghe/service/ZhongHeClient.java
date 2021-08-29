@@ -15,18 +15,24 @@ import java.util.List;
 public interface ZhongHeClient {
     /**
      * test
+     *
+     * @return {@link ZhongHeResult}
      */
-    void test();
+    ZhongHeResult<?> test();
 
     /**
      * 初始化中间件
+     *
+     * @return {@link ZhongHeResult}
      */
-    void initMiddleWare();
+    ZhongHeResult<?> initMiddleWare();
 
     /**
      * 关闭
+     *
+     * @return {@link ZhongHeResult}
      */
-    void close();
+    ZhongHeResult<?> close();
 
     //------------------------------------------task--------------------------------------------------------------------
 
@@ -34,23 +40,34 @@ public interface ZhongHeClient {
      * 新增定时任务
      *
      * @param request {@link TaskRequest}
+     * @return {@link ZhongHeResult}
      */
-    void addTimingTask(TaskRequest request);
+    ZhongHeResult<String> addTimingTask(TaskRequest request);
 
     /**
      * 编辑任务
      *
      * @param id      id
      * @param request {@link TaskRequest}
+     * @return {@link ZhongHeResult}
      */
-    void editTimingTask(String id, TaskRequest request);
+    ZhongHeResult<?> editTimingTask(String id, TaskRequest request);
 
     /**
      * 删除定时任务
      *
      * @param id id
+     * @return {@link ZhongHeResult}
      */
-    void deleteTimingTask(String id);
+    ZhongHeResult<?> deleteTimingTask(String id, TaskRequest request);
+
+    /**
+     * 终止指定id的任务
+     *
+     * @param id id
+     * @return {@link ZhongHeResult}
+     */
+    ZhongHeResult<?> abortTaskBySubId(String id);
 
     //------------------------------download data----------------------------------------------------------------------------
 

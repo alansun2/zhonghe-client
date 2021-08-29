@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class SendClient {
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
-    private Channel channel;
+    private volatile Channel channel;
     private static ZhongHeConfig zhongHeConfig;
 
     private static volatile SendClient sendClient;
@@ -92,13 +92,26 @@ public class SendClient {
      * @return {@link Channel}
      */
     private Channel getChannel() {
-        while (channel == null) {
+        if (channel == null) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (channel == null) {
+                try {
+                    this.startListener();
+                } catch (Exception e) {
+                    log.warn("启动客户端失败");
+                }
+            }
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+
         return channel;
     }
 
@@ -147,7 +160,7 @@ public class SendClient {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            ResultInternal resultInternal = SyncResultSupport.cmdResultMap.get(cmdEnum);
+            ResultInternal resultInternal = SyncResultSupport.resultInternal;
             if (resultInternal == null) {
                 log.info("cmd: [{}], para: [{}], 收到: [{}]", cmdEnum, para, "10秒超时");
                 resultInternal = new ResultInternal();
@@ -157,7 +170,7 @@ public class SendClient {
 
             return resultInternal;
         } finally {
-            SyncResultSupport.cmdResultMap.remove(cmdEnum);
+            SyncResultSupport.resultInternal = null;
         }
     }
 

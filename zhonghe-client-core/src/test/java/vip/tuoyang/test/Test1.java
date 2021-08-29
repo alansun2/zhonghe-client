@@ -119,4 +119,11 @@ public class Test1 {
         final List<String> strings = ServiceUtils.partContent2ListByLength(s.replace(" ", ""), 264);
         strings.forEach(System.out::println);
     }
+
+    @Test
+    public void checkSum(){
+        final String s = "FE E0 A7 8A  11 10 00 00  B6 0E 05 00  0D 03 00 09 00 00 00 00 06";
+        final int i = ServiceUtils.computeChkSum(s.replace(" ", ""));
+        System.out.println(i);
+    }
 }

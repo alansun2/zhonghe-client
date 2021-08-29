@@ -2,6 +2,7 @@ package vip.tuoyang.zhonghe.bean;
 
 import lombok.Getter;
 import lombok.Setter;
+import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
 
 /**
  * @author AlanSun
@@ -18,4 +19,14 @@ public class ResultInternal {
     private String originalData;
 
     private Object data;
+
+    private ZhongHeResponse zhongHeResponse;
+
+    public <T> ZhongHeResult<T> toZhongHeResult() {
+        ZhongHeResult<T> zhongHeResult = new ZhongHeResult<>();
+        zhongHeResult.setSuccess(this.isSuccess);
+        zhongHeResult.setErrorMsg(this.errorMsg);
+        zhongHeResult.setData((T) this.data);
+        return zhongHeResult;
+    }
 }

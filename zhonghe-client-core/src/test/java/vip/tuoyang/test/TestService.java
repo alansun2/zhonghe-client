@@ -46,7 +46,6 @@ public class TestService {
     @Test
     public void init() {
         zhongHeClient.initMiddleWare();
-        LockSupport.park();
     }
 
     @Test
@@ -77,13 +76,60 @@ public class TestService {
     }
 
     @Test
-    public void testAll() throws InterruptedException {
-        zhongHeClient.initMiddleWare();
-        Thread.sleep(1000);
+    public void testAll() {
         final ZhongHeResult<List<MediaFileDataResponse>> mediaFiles = zhongHeClient.getMediaFiles();
         if (mediaFiles.isSuccess()) {
             final List<MediaFileDataResponse> data = mediaFiles.getData();
             data.forEach(mediaFileDataResponse -> System.out.println(mediaFileDataResponse.getNo() + ":" + mediaFileDataResponse.getMediaFileName()));
         }
+    }
+
+    @Test
+    public void testAddTimingTask() {
+        TaskRequest request = new TaskRequest();
+        request.setTaskType((byte) 0);
+        request.setTaskName("test");
+        request.setPlayMode((byte) 0);
+        request.setStartTime(LocalDateTime.of(2021, 9, 1, 0, 0, 0));
+        request.setEndTime(LocalDateTime.of(2021, 9, 1, 0, 10, 0));
+        request.setTimeType((byte) 1);
+        request.setTimeMode((byte) 0);
+        request.setWeekOption("1,2,5");
+        request.setPlayContentIdList(Collections.singletonList("0001"));
+        request.setPlayObjectIdList(Collections.singletonList("00001000"));
+        final ZhongHeResult<String> stringZhongHeResult = zhongHeClient.addTimingTask(request);
+        System.out.println(stringZhongHeResult.getData());
+    }
+
+    @Test
+    public void editTimingTask() {
+        TaskRequest request = new TaskRequest();
+        request.setTaskType((byte) 0);
+        request.setTaskName("test");
+        request.setPlayMode((byte) 0);
+        request.setStartTime(LocalDateTime.of(2021, 9, 1, 11, 0, 0));
+        request.setEndTime(LocalDateTime.of(2021, 9, 1, 11, 10, 0));
+        request.setTimeType((byte) 1);
+        request.setTimeMode((byte) 0);
+        request.setWeekOption("1,4,5");
+        request.setPlayContentIdList(Collections.singletonList("0001"));
+        request.setPlayObjectIdList(Collections.singletonList("00001000"));
+        final ZhongHeResult<?> zhongHeResult = zhongHeClient.editTimingTask("06", request);
+    }
+
+    @Test
+    public void deleteTimingTask() {
+        TaskRequest request = new TaskRequest();
+        request.setTaskType((byte) 0);
+        request.setTaskName("test");
+        request.setPlayMode((byte) 0);
+        request.setStartTime(LocalDateTime.of(2021, 9, 1, 0, 0, 0));
+        request.setEndTime(LocalDateTime.of(2021, 9, 1, 0, 10, 0));
+        request.setTimeType((byte) 1);
+        request.setTimeMode((byte) 0);
+        request.setWeekOption("1,2,5");
+        request.setPlayContentIdList(Collections.singletonList("0001"));
+        request.setPlayObjectIdList(Collections.singletonList("00001000"));
+        zhongHeClient.deleteTimingTask("06", request);
     }
 }

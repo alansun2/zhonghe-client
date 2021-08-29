@@ -14,7 +14,7 @@ import java.util.Map;
 public class SyncResultSupport {
     public static CountDownLatch2 downloadResultDataCountDown = new CountDownLatch2(1);
 
-    public static Map<CmdEnum, ResultInternal> cmdResultMap = new HashMap<>(16);
+    public static ResultInternal resultInternal;
 
     public static Map<String, ZhongHeDownloadResult> downloadParaResultMap = new HashMap<>(16);
 
