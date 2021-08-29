@@ -8,7 +8,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import lombok.extern.slf4j.Slf4j;
-import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
@@ -24,7 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author AlanSun
@@ -39,8 +37,6 @@ public class SendClient {
     private static volatile SendClient sendClient;
 
     private static InetSocketAddress inetSocketAddress;
-
-    private ReentrantLock lock = new ReentrantLock();
 
     private SendClient() {
         startListener();
@@ -114,11 +110,6 @@ public class SendClient {
      * @param content 16 字节之后的参数
      */
     public ResultInternal send(CmdEnum cmdEnum, String para, String content) {
-        final int holdCount = lock.getHoldCount();
-        if (holdCount > 20) {
-            throw new BizException("系统繁忙");
-        }
-        lock.lock();
         try {
             SyncResultSupport.cmdResultCountDownMap.get(cmdEnum).reset();
             StringBuilder sb = new StringBuilder();
@@ -156,19 +147,16 @@ public class SendClient {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            ResultInternal zhongHeResult = SyncResultSupport.cmdResultMap.get(cmdEnum);
-            if (zhongHeResult == null) {
+            ResultInternal resultInternal = SyncResultSupport.cmdResultMap.get(cmdEnum);
+            if (resultInternal == null) {
                 log.info("cmd: [{}], para: [{}], 收到: [{}]", cmdEnum, para, "10秒超时");
-                zhongHeResult = new ResultInternal();
-                zhongHeResult.setSuccess(false);
-                zhongHeResult.setErrorMsg("超时");
-            } else {
-                log.info("cmd: [{}], para: [{}], 收到: [{}]", cmdEnum, para, zhongHeResult.getOriginalData());
+                resultInternal = new ResultInternal();
+                resultInternal.setSuccess(false);
+                resultInternal.setErrorMsg("超时");
             }
 
-            return zhongHeResult;
+            return resultInternal;
         } finally {
-            lock.unlock();
             SyncResultSupport.cmdResultMap.remove(cmdEnum);
         }
     }
@@ -176,11 +164,11 @@ public class SendClient {
     /**
      * 发送指令
      *
-     * @param cmd     指令
+     * @param cmdEnum 指令
      * @param para    指令参数
      * @param content 16 字节之后的参数
      */
-    public void sendAsync(String cmd, String para, String content) {
+    public void sendAsync(CmdEnum cmdEnum, String para, long sn, String content) {
         StringBuilder sb = new StringBuilder();
         // 0 1 2 固定
         sb.append("FEE0A7");
@@ -189,9 +177,9 @@ public class SendClient {
         // 4 5 6 7 deviceId, init 时可以传0
         sb.append(ServiceUtils.changeOrder(zhongHeConfig.getDeviceId(), 2));
         // 8 9 sn 帧数
-        sb.append(ServiceUtils.changeOrder(ConvertCode.intToHexString(atomicInteger.get(), 2), 2));
+        sb.append(ConvertCode.int2HexLittle((int) sn));
         // 12 cmd
-        sb.append(cmd);
+        sb.append(cmdEnum.getValue());
         // 13 para
         sb.append(para);
         // 14 accept
@@ -209,7 +197,7 @@ public class SendClient {
             sb.append(content);
         }
 
-        log.info("cmd: [{}], para: [{}], 发送: [{}]", cmd, para, sb.toString());
+        log.info("cmd: [{}], para: [{}], 发送: [{}]", cmdEnum, para, sb.toString());
         getChannel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Objects.requireNonNull(ConvertCode.hexString2Bytes(sb.toString()))), inetSocketAddress));
     }
 }

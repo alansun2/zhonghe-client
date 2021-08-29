@@ -11,14 +11,7 @@ public class DownloadReceiverHandler implements ResultHandler {
 
     @Override
     public void handler(ZhongHeResponse zhongHeResponse) {
-        final int sn = zhongHeResponse.getSn();
-        long end = 0b10000000000000000L;
-        if ((sn & end) == end) {
-            // 结束
-        }
-
         final DownloadHandlerContext downloadHandlerContext = DownloadHandlerContext.create(zhongHeResponse.getPara());
         downloadHandlerContext.handler(zhongHeResponse);
     }
 }
-;

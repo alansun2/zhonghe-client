@@ -17,5 +17,5 @@ public class MediaFileDataResponse {
     /**
      * 文件名称
      */
-    private String name;
+    private String mediaFileName;
 }

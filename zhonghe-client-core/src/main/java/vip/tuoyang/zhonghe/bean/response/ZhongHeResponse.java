@@ -2,6 +2,7 @@ package vip.tuoyang.zhonghe.bean.response;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import vip.tuoyang.zhonghe.constants.AcceptEnum;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
@@ -10,6 +11,7 @@ import vip.tuoyang.zhonghe.utils.ServiceUtils;
  * @author AlanSun
  * @date 2021/8/28 15:12
  */
+@ToString
 @Getter
 @Setter
 public class ZhongHeResponse {
@@ -20,7 +22,7 @@ public class ZhongHeResponse {
     /**
      * 帧数
      */
-    private int sn;
+    private long sn;
     /**
      * 16字节之后的长度
      */
@@ -50,12 +52,12 @@ public class ZhongHeResponse {
         ZhongHeResponse zhongHeResponse = new ZhongHeResponse();
         zhongHeResponse.setOriginalData(receiveContent);
         zhongHeResponse.setDeviceId(ServiceUtils.changeOrder(receiveContent.substring(8, 15), 2));
-        zhongHeResponse.setSn(Integer.parseInt(ServiceUtils.changeOrder(receiveContent.substring(16, 20), 2), 16));
+        zhongHeResponse.setSn(Long.parseLong(ServiceUtils.changeOrder(receiveContent.substring(16, 20), 2), 16));
         zhongHeResponse.setLen(Integer.parseInt(ServiceUtils.changeOrder(receiveContent.substring(20, 24), 2), 16));
         zhongHeResponse.setCmdEnum(CmdEnum.valueBy(receiveContent.substring(24, 26)));
         zhongHeResponse.setPara(receiveContent.substring(26, 28));
         zhongHeResponse.setAcceptEnum(AcceptEnum.valueBy(receiveContent.substring(28, 30)));
-        zhongHeResponse.setContent(receiveContent.substring(32, 32 + zhongHeResponse.getLen()));
+        zhongHeResponse.setContent(receiveContent.substring(32, 32 + zhongHeResponse.getLen() * 2));
         return zhongHeResponse;
     }
 
@@ -65,7 +67,7 @@ public class ZhongHeResponse {
      * @return true: 是; false: 否
      */
     public boolean isLastSn() {
-        long end = 0b10000000000000000L;
+        long end = 0b1000000000000000L;
         return (sn & end) == end;
     }
 }

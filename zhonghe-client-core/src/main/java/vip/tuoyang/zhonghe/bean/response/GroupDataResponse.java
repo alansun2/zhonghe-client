@@ -19,7 +19,7 @@ public class GroupDataResponse {
     /**
      * 文件名称
      */
-    private String name;
+    private String groupName;
     /**
      * 组内的终端id
      */

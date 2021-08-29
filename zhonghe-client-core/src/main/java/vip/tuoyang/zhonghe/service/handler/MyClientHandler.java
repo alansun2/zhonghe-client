@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import lombok.extern.slf4j.Slf4j;
+import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
 import vip.tuoyang.zhonghe.service.resulthandle.ResultHandlerContext;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
@@ -21,8 +22,10 @@ public class MyClientHandler extends SimpleChannelInboundHandler<DatagramPacket>
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket packet) {
         final String receiverData = ConvertCode.bytes2HexString(ByteBufUtil.getBytes(packet.content()));
         final ZhongHeResponse zhongHeResponse = ZhongHeResponse.parse(receiverData);
+        log.info("接收到响应帧: [{}]", zhongHeResponse);
         final ResultHandlerContext resultHandlerContext = ResultHandlerContext.create(zhongHeResponse.getCmdEnum());
-        SyncResultSupport.resultInternal = resultHandlerContext.handle(zhongHeResponse);
+        final ResultInternal resultInternal = resultHandlerContext.handle(zhongHeResponse);
+        SyncResultSupport.cmdResultMap.put(zhongHeResponse.getCmdEnum(), resultInternal);
         SyncResultSupport.cmdResultCountDownMap.get(zhongHeResponse.getCmdEnum()).countDown();
     }
 }

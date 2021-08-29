@@ -36,7 +36,7 @@ public class MediaFileDataDownloadHandler implements DownLoadResultHandler {
             mediaFileDataResponse.setNo(ServiceUtils.changeOrder(s.substring(0, 4), 2));
             int startIndex = 10;
             int endIndex = Integer.parseInt(s.substring(8, 10), 16) * 2;
-            mediaFileDataResponse.setName(ServiceUtils.getContentFromHex(s.substring(startIndex, startIndex + endIndex)));
+            mediaFileDataResponse.setMediaFileName(ServiceUtils.getContentFromHex(s.substring(startIndex, startIndex + endIndex)));
             return mediaFileDataResponse;
         }).collect(Collectors.toList());
 
@@ -44,6 +44,7 @@ public class MediaFileDataDownloadHandler implements DownLoadResultHandler {
         if (zhongHeDownloadResult == null) {
             zhongHeDownloadResult = new ZhongHeDownloadResult();
             zhongHeDownloadResult.setData(mediaFileDataResponses);
+            SyncResultSupport.downloadParaResultMap.put(para, zhongHeDownloadResult);
         } else {
             final List<MediaFileDataResponse> data = (List<MediaFileDataResponse>) zhongHeDownloadResult.getData();
             data.addAll(mediaFileDataResponses);

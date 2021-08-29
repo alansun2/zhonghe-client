@@ -2,7 +2,9 @@ package vip.tuoyang.zhonghe.service.downloadhandler;
 
 import lombok.extern.slf4j.Slf4j;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
+import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.constants.DownloadTypeEnum;
+import vip.tuoyang.zhonghe.service.SendClient;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 
 /**
@@ -37,9 +39,15 @@ public class DownloadHandlerContext {
      * @param zhongHeResponse {@link ZhongHeResponse}
      */
     public void handler(ZhongHeResponse zhongHeResponse) {
-        if (zhongHeResponse.isLastSn()) {
+        if (zhongHeResponse.getContent().length() == 0) {
             SyncResultSupport.downloadResultDataCountDown.countDown();
+        } else {
+            downLoadResultHandler.handler(zhongHeResponse.getPara(), zhongHeResponse.getContent());
+            if (zhongHeResponse.isLastSn()) {
+                SyncResultSupport.downloadResultDataCountDown.countDown();
+            } else {
+                SendClient.getSingleton().sendAsync(CmdEnum.SEND_NEXT_DATA, "00", zhongHeResponse.getSn(), null);
+            }
         }
-        downLoadResultHandler.handler(zhongHeResponse.getPara(), zhongHeResponse.getContent());
     }
 }
