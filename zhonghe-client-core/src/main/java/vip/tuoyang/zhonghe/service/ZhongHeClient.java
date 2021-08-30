@@ -62,6 +62,22 @@ public interface ZhongHeClient {
     ZhongHeResult<?> deleteTimingTask(String id, TaskRequest request);
 
     /**
+     * 添加可编辑任务
+     *
+     * @param request {@link TaskRequest}
+     * @return {@link ZhongHeResult}
+     */
+    ZhongHeResult<String> addEditableTask(TaskRequest request);
+
+    /**
+     * 取消任务
+     *
+     * @param subId subId
+     * @return {@link ZhongHeResult}
+     */
+    ZhongHeResult<?> abortBySubId(String subId);
+
+    /**
      * 终止指定id的任务
      *
      * @param id id

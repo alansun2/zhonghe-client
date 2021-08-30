@@ -3,6 +3,8 @@ package vip.tuoyang.zhonghe.bean;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collections;
+
 /**
  * @author AlanSun
  * @date 2021/8/28 15:03
@@ -15,5 +17,5 @@ public class ZhongHeDownloadResult {
 
     private String errorMsg;
 
-    private Object data;
+    private Object data = Collections.emptyList();
 }

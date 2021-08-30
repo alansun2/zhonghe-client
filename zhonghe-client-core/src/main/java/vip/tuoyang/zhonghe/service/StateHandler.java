@@ -12,10 +12,12 @@ import vip.tuoyang.zhonghe.support.SyncResultSupport;
 public class StateHandler {
     public static void fillData(ZhongHeResponse zhongHeResponse) {
         final ResultInternal resultInternal = SyncResultSupport.resultInternal;
-        final CmdEnum cmdEnum = resultInternal.getZhongHeResponse().getCmdEnum();
-        if (cmdEnum == CmdEnum.PRO_TIMING_TASK) {
-            resultInternal.setData(zhongHeResponse.getContent().substring(8, 10));
-            SyncResultSupport.cmdResultCountDownMap.get(cmdEnum).countDown();
+        if (resultInternal != null) {
+            final CmdEnum cmdEnum = resultInternal.getZhongHeResponse().getCmdEnum();
+            if (cmdEnum == CmdEnum.PRO_TIMING_TASK || cmdEnum == CmdEnum.REQUEST_EDITABLE_TASK) {
+                resultInternal.setData(zhongHeResponse.getContent().substring(8, 10));
+                SyncResultSupport.cmdResultCountDownMap.get(cmdEnum).countDown();
+            }
         }
     }
 }

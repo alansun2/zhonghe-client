@@ -8,6 +8,10 @@ package vip.tuoyang.zhonghe.constants;
  **/
 public enum DownloadTypeEnum {
     /**
+     * 播放终端
+     */
+    TERMINAL_PLAYER("01"),
+    /**
      * 终端分组
      */
     TERMINAL_GROUP("03"),
@@ -26,6 +30,8 @@ public enum DownloadTypeEnum {
 
     public static DownloadTypeEnum valueBy(String para) {
         switch (para) {
+            case "01":
+                return TERMINAL_PLAYER;
             case "03":
                 return TERMINAL_GROUP;
             case "04":

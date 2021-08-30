@@ -31,7 +31,8 @@ public class MyClientHandler extends SimpleChannelInboundHandler<DatagramPacket>
         } else {
             StateHandler.fillData(zhongHeResponse);
         }
-        if (zhongHeResponse.getCmdEnum() != CmdEnum.PRO_TIMING_TASK) {
+
+        if (zhongHeResponse.getCmdEnum() != CmdEnum.PRO_TIMING_TASK && zhongHeResponse.getCmdEnum() != CmdEnum.REQUEST_EDITABLE_TASK) {
             SyncResultSupport.cmdResultCountDownMap.get(zhongHeResponse.getCmdEnum()).countDown();
         }
     }

@@ -4,19 +4,18 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
 import vip.tuoyang.zhonghe.bean.request.TaskRequest;
+import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
+import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.service.SendClient;
 import vip.tuoyang.zhonghe.service.ZhongHeClient;
 import vip.tuoyang.zhonghe.service.ZhongHeClientImpl;
 import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author AlanSun
@@ -53,34 +52,30 @@ public class TestService {
         zhongHeClient.close();
     }
 
-    /**
-     * 发送定时任务
-     */
     @Test
-    public void sendTimingTask() {
-        TaskRequest taskRequest = new TaskRequest();
-        taskRequest.setTaskName("testttt");
-        taskRequest.setPlayMode((byte) 3);
-        taskRequest.setStartTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 0)));
-        taskRequest.setTaskType((byte) 1);
-        taskRequest.setWeekOption("1,3,5,7");
-        taskRequest.setPlayContentIdList(Collections.singletonList("0001"));
-        taskRequest.setPlayObjectIdList(Collections.singletonList("00001000"));
-        zhongHeClient.addTimingTask(taskRequest);
-    }
-
-    @Test
-    public void getMediaFiles() {
-        zhongHeClient.getMediaFiles();
-        LockSupport.park();
-    }
-
-    @Test
-    public void testAll() {
+    public void testGetMediaFiles() {
         final ZhongHeResult<List<MediaFileDataResponse>> mediaFiles = zhongHeClient.getMediaFiles();
         if (mediaFiles.isSuccess()) {
             final List<MediaFileDataResponse> data = mediaFiles.getData();
             data.forEach(mediaFileDataResponse -> System.out.println(mediaFileDataResponse.getNo() + ":" + mediaFileDataResponse.getMediaFileName()));
+        }
+    }
+
+    @Test
+    public void testGetGroups() {
+        final ZhongHeResult<List<GroupDataResponse>> terminalGroups = zhongHeClient.getTerminalGroups();
+        if (terminalGroups.isSuccess()) {
+            final List<GroupDataResponse> data = terminalGroups.getData();
+            data.forEach(mediaFileDataResponse -> System.out.println(mediaFileDataResponse.getNo() + ":" + mediaFileDataResponse.getGroupName() + ": [" + String.join(",", mediaFileDataResponse.getTerminalNos()) + "}"));
+        }
+    }
+
+    @Test
+    public void getPlayers() {
+        final ZhongHeResult<List<TerminalDataResponse>> playersByNos = zhongHeClient.getPlayersByNos();
+        if (playersByNos.isSuccess()) {
+            final List<TerminalDataResponse> data = playersByNos.getData();
+            data.forEach(mediaFileDataResponse -> System.out.println(mediaFileDataResponse.getTerminalNo() + ":" + mediaFileDataResponse.getTerminalName() + ":" + mediaFileDataResponse.getTerminalStatus()));
         }
     }
 
@@ -131,5 +126,19 @@ public class TestService {
         request.setPlayContentIdList(Collections.singletonList("0001"));
         request.setPlayObjectIdList(Collections.singletonList("00001000"));
         zhongHeClient.deleteTimingTask("06", request);
+    }
+
+    @Test
+    public void instantTask() {
+        TaskRequest request = new TaskRequest();
+        request.setTaskType((byte) 0);
+        request.setTaskName("test");
+        request.setPlayMode((byte) 2);
+        request.setTimeType((byte) 0);
+        request.setTimeMode((byte) 2);
+        request.setPlayContentIdList(Collections.singletonList("0001"));
+        request.setPlayObjectIdList(Collections.singletonList("FFFFFF01"));
+        final ZhongHeResult<String> stringZhongHeResult = zhongHeClient.addEditableTask(request);
+        System.out.println(stringZhongHeResult.getData());
     }
 }

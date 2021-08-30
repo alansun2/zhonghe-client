@@ -35,22 +35,22 @@ public class GroupDataDownloadHandler implements DownLoadResultHandler {
             GroupDataResponse groupDataResponse = new GroupDataResponse();
             groupDataResponse.setNo(ServiceUtils.changeOrder(contentStr.substring(0, 8), 2));
             final int len = Integer.parseInt(contentStr.substring(8, 10), 16);
-            groupDataResponse.setGroupName(ServiceUtils.getContentFromHex(contentStr.substring(10, len * 2)));
+            groupDataResponse.setGroupName(ServiceUtils.getContentFromHex(contentStr.substring(10, 10 + len * 2)));
 
             List<String> terminalNos = new ArrayList<>();
-            final String nosStr = contentStr.substring(32 * 2);
-            final int length = nosStr.length() / 4;
+            final String nosStr = contentStr.substring(36 * 2);
+            final int length = nosStr.length() / 8;
             int i = 0;
             for (; i < length; i++) {
-                final String no = nosStr.substring(32 * 2 + (i * 8), 32 * 2 + ((i + 1) * 8));
+                final String no = nosStr.substring(i * 8, (i + 1) * 8);
                 if ("00000000".equals(no)) {
                     break;
                 }
                 terminalNos.add(ServiceUtils.changeOrder(no, 2));
             }
             groupDataResponse.setTerminalNos(terminalNos);
-            contentStr = contentStr.substring(72 + i);
             groupDataResponseList.add(groupDataResponse);
+            contentStr = contentStr.substring(72 + length * 8);
         } while (contentStr.length() != 0);
 
 

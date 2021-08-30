@@ -11,6 +11,7 @@ import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
+import vip.tuoyang.zhonghe.service.task.EditableTask;
 import vip.tuoyang.zhonghe.service.task.TimingFileTask;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
@@ -118,6 +119,29 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     }
 
     /**
+     * 添加可编辑任务
+     *
+     * @param request {@link TaskRequest}
+     * @return {@link ZhongHeResult}
+     */
+    @Override
+    public ZhongHeResult<String> addEditableTask(TaskRequest request) {
+        final String generator = EditableTask.getInstance().generator("00", request);
+        return SendClient.getSingleton().send(CmdEnum.REQUEST_EDITABLE_TASK, "00", generator.toUpperCase()).toZhongHeResult();
+    }
+
+    /**
+     * 取消任务
+     *
+     * @param subId subId
+     * @return {@link ZhongHeResult}
+     */
+    @Override
+    public ZhongHeResult<?> abortBySubId(String subId) {
+        return null;
+    }
+
+    /**
      * 终止指定id的任务
      *
      * @param id id
@@ -158,24 +182,28 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     private <T> ZhongHeResult<List<T>> getDownloadData(String para) {
         ZhongHeResult<List<T>> zhongHeResult = new ZhongHeResult<>();
-        final ResultInternal resultInternal = SendClient.getSingleton().send(CmdEnum.DOWNLOAD_DATA, para, null);
-        if (resultInternal.isSuccess()) {
-            try {
-                SyncResultSupport.downloadResultDataCountDown.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            final ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.downloadParaResultMap.get(para);
-            if (zhongHeDownloadResult.isSuccess()) {
-                final List<T> data = (List<T>) zhongHeDownloadResult.getData();
-                zhongHeResult.setData(data);
+        try {
+            final ResultInternal resultInternal = SendClient.getSingleton().send(CmdEnum.DOWNLOAD_DATA, para, null);
+            if (resultInternal.isSuccess()) {
+                try {
+                    SyncResultSupport.downloadResultDataCountDown.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                final ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.downloadParaResultMap.get(para);
+                if (zhongHeDownloadResult.isSuccess()) {
+                    final List<T> data = (List<T>) zhongHeDownloadResult.getData();
+                    zhongHeResult.setData(data);
+                } else {
+                    zhongHeResult.setSuccess(false);
+                    zhongHeResult.setErrorMsg(zhongHeDownloadResult.getErrorMsg());
+                }
             } else {
                 zhongHeResult.setSuccess(false);
-                zhongHeResult.setErrorMsg(zhongHeDownloadResult.getErrorMsg());
+                zhongHeResult.setErrorMsg(resultInternal.getErrorMsg());
             }
-        } else {
-            zhongHeResult.setSuccess(false);
-            zhongHeResult.setErrorMsg(resultInternal.getErrorMsg());
+        } finally {
+            SyncResultSupport.downloadParaResultMap.remove(para);
         }
         return zhongHeResult;
     }

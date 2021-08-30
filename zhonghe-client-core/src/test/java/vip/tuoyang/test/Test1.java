@@ -26,7 +26,8 @@ public class Test1 {
 
     @Test
     public void textTest() throws UnsupportedEncodingException {
-        String a = "D6DCBDDCC2D7202D20B5BECFE32E6D7033";
+        String a = "D0C2BDA8B7D6D7E9";
+        System.out.println(ServiceUtils.getContentFromHex(a));
         final String gbk = new String(Objects.requireNonNull(ConvertCode.hexString2Bytes(a.replace(" ", ""))), "GBK");
         System.out.println(gbk);
     }

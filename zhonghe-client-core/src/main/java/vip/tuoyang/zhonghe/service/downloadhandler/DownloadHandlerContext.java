@@ -1,6 +1,7 @@
 package vip.tuoyang.zhonghe.service.downloadhandler;
 
 import lombok.extern.slf4j.Slf4j;
+import vip.tuoyang.zhonghe.bean.ZhongHeDownloadResult;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.constants.DownloadTypeEnum;
@@ -18,6 +19,9 @@ public class DownloadHandlerContext {
     private DownloadHandlerContext(String para) {
         final DownloadTypeEnum downloadTypeEnum = DownloadTypeEnum.valueBy(para);
         switch (downloadTypeEnum) {
+            case TERMINAL_PLAYER:
+                downLoadResultHandler = PlayerDataDownloadHandler.getInstance();
+                break;
             case TERMINAL_GROUP:
                 downLoadResultHandler = GroupDataDownloadHandler.getInstance();
                 break;
@@ -40,6 +44,7 @@ public class DownloadHandlerContext {
      */
     public void handler(ZhongHeResponse zhongHeResponse) {
         if (zhongHeResponse.getContent().length() == 0) {
+            SyncResultSupport.downloadParaResultMap.put(zhongHeResponse.getPara(), new ZhongHeDownloadResult());
             SyncResultSupport.downloadResultDataCountDown.countDown();
         } else {
             downLoadResultHandler.handler(zhongHeResponse.getPara(), zhongHeResponse.getContent());
