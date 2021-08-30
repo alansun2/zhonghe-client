@@ -8,7 +8,6 @@ import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
-import vip.tuoyang.zhonghe.service.SendClient;
 import vip.tuoyang.zhonghe.service.ZhongHeClient;
 import vip.tuoyang.zhonghe.service.ZhongHeClientImpl;
 import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
@@ -37,19 +36,13 @@ public class TestService {
         zhongHeConfig.setNasConnectPort(8100);
         zhongHeConfig.setNasControlPort(8101);
         zhongHeConfig.setNasCapturePort(8201);
-        SendClient.init(zhongHeConfig);
-        zhongHeClient = ZhongHeClientLockProxy.getProxy(new ZhongHeClientImpl(zhongHeConfig));
+        zhongHeClient = ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig));
         Thread.sleep(5000);
     }
 
     @Test
     public void init() {
         zhongHeClient.initMiddleWare();
-    }
-
-    @Test
-    public void close() {
-        zhongHeClient.close();
     }
 
     @Test

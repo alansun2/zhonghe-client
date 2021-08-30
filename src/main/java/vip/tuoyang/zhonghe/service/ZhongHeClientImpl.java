@@ -27,9 +27,16 @@ import java.util.List;
 public class ZhongHeClientImpl implements ZhongHeClient {
     private final ZhongHeConfig zhongHeConfig;
 
-    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig) {
+    private final SendClient sendClient;
+
+    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig, SendClient sendClient) {
         zhongHeConfig.valid();
         this.zhongHeConfig = zhongHeConfig;
+        this.sendClient = sendClient;
+    }
+
+    public static ZhongHeClient create(ZhongHeConfig zhongHeConfig) {
+        return new ZhongHeClientImpl(zhongHeConfig, new SendClient(zhongHeConfig));
     }
 
     /**
@@ -37,7 +44,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<?> test() {
-        return SendClient.getSingleton().send(CmdEnum.TEST, "00", null).toZhongHeResult();
+        return sendClient.send(CmdEnum.TEST, "00", null).toZhongHeResult();
     }
 
     /**
@@ -71,7 +78,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
         // 62 63
         sb.append("0000");
 
-        return SendClient.getSingleton().send(CmdEnum.INIT, "00", sb.toString()).toZhongHeResult();
+        return sendClient.send(CmdEnum.INIT, "00", sb.toString()).toZhongHeResult();
     }
 
     /**
@@ -79,7 +86,9 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<?> close() {
-        return SendClient.getSingleton().send(CmdEnum.CLOSE, "00", null).toZhongHeResult();
+        final ZhongHeResult<Object> objectZhongHeResult = sendClient.send(CmdEnum.CLOSE, "00", null).toZhongHeResult();
+        sendClient.close();
+        return objectZhongHeResult;
     }
 
     //------------------------------------------task--------------------------------------------------------------------
@@ -92,7 +101,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public ZhongHeResult<String> addTimingTask(TaskRequest request) {
         final String generator = TimingFileTask.getInstance().generator("FE", request);
-        return SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "01", generator.toUpperCase()).toZhongHeResult();
+        return sendClient.send(CmdEnum.PRO_TIMING_TASK, "01", generator.toUpperCase()).toZhongHeResult();
     }
 
     /**
@@ -104,7 +113,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public ZhongHeResult<?> editTimingTask(String id, TaskRequest request) {
         final String generator = TimingFileTask.getInstance().generator(id, request);
-        return SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "02", generator).toZhongHeResult();
+        return sendClient.send(CmdEnum.PRO_TIMING_TASK, "02", generator).toZhongHeResult();
     }
 
     /**
@@ -115,7 +124,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public ZhongHeResult<?> deleteTimingTask(String id, TaskRequest request) {
         final String generator = TimingFileTask.getInstance().generator(id, request);
-        return SendClient.getSingleton().send(CmdEnum.PRO_TIMING_TASK, "03", generator).toZhongHeResult();
+        return sendClient.send(CmdEnum.PRO_TIMING_TASK, "03", generator).toZhongHeResult();
     }
 
     /**
@@ -127,7 +136,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public ZhongHeResult<String> addEditableTask(TaskRequest request) {
         final String generator = EditableTask.getInstance().generator("00", request);
-        return SendClient.getSingleton().send(CmdEnum.REQUEST_EDITABLE_TASK, "00", generator.toUpperCase()).toZhongHeResult();
+        return sendClient.send(CmdEnum.REQUEST_EDITABLE_TASK, "00", generator.toUpperCase()).toZhongHeResult();
     }
 
     /**
@@ -148,7 +157,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<?> abortTaskBySubId(String id) {
-        return SendClient.getSingleton().send(CmdEnum.ABORT_TASK_BY_SUB_ID, "00", ServiceUtils.changeOrder(id, 2)).toZhongHeResult();
+        return sendClient.send(CmdEnum.ABORT_TASK_BY_SUB_ID, "00", ServiceUtils.changeOrder(id, 2)).toZhongHeResult();
     }
 
     //------------------------------download data----------------------------------------------------------------------------
@@ -183,7 +192,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     private <T> ZhongHeResult<List<T>> getDownloadData(String para) {
         ZhongHeResult<List<T>> zhongHeResult = new ZhongHeResult<>();
         try {
-            final ResultInternal resultInternal = SendClient.getSingleton().send(CmdEnum.DOWNLOAD_DATA, para, null);
+            final ResultInternal resultInternal = sendClient.send(CmdEnum.DOWNLOAD_DATA, para, null);
             if (resultInternal.isSuccess()) {
                 try {
                     SyncResultSupport.downloadResultDataCountDown.await();

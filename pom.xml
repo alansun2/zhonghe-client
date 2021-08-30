@@ -8,10 +8,6 @@
     <artifactId>zhonghe-client</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
-    <modules>
-        <module>zhonghe-client-core</module>
-        <module>zhonghe-spring-boot-starter</module>
-    </modules>
 
     <dependencies>
         <dependency>
@@ -123,4 +119,19 @@
             </snapshots>
         </repository>
     </repositories>
+
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>nexus-release</name>
+            <url>http://183.249.230.208:5086/repository/maven-releases/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>nexus-snapshot</name>
+            <url>http://183.249.230.208:5086/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

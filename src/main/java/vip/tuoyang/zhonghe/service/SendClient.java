@@ -29,33 +29,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2021/8/24 15:37
  */
 @Slf4j
-public class SendClient {
+class SendClient {
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
     private volatile Channel channel;
-    private static ZhongHeConfig zhongHeConfig;
+    private final ZhongHeConfig zhongHeConfig;
+    private final InetSocketAddress inetSocketAddress;
 
-    private static volatile SendClient sendClient;
-
-    private static InetSocketAddress inetSocketAddress;
-
-    private SendClient() {
-        startListener();
-    }
-
-    public static void init(ZhongHeConfig zhongHeConfig1) {
-        zhongHeConfig = zhongHeConfig1;
-    }
-
-    public static SendClient getSingleton() {
-        if (sendClient == null) {
-            synchronized (SendClient.class) {
-                if (sendClient == null) {
-                    sendClient = new SendClient();
-                    inetSocketAddress = new InetSocketAddress(zhongHeConfig.getMiddleWareIp(), zhongHeConfig.getMiddleWarePort());
-                }
-            }
-        }
-        return sendClient;
+    public SendClient(ZhongHeConfig zhongHeConfig) {
+        this.zhongHeConfig = zhongHeConfig;
+        inetSocketAddress = new InetSocketAddress(zhongHeConfig.getMiddleWareIp(), zhongHeConfig.getMiddleWarePort());
+        this.startListener();
     }
 
     private final ExecutorService executorService = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50), r -> {
@@ -113,6 +96,12 @@ public class SendClient {
         }
 
         return channel;
+    }
+
+    public void close() {
+        if (channel.isActive()) {
+            channel.close();
+        }
     }
 
     /**
