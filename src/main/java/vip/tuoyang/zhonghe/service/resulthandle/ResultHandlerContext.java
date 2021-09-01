@@ -18,7 +18,13 @@ public class ResultHandlerContext {
     private ResultHandlerContext(CmdEnum cmdEnum) {
         switch (cmdEnum) {
             case SEND_DATA:
-                resultHandler = new DownloadReceiverHandler();
+                resultHandler = DownloadReceiverHandler.getInstance();
+                break;
+            case REQUEST_EDITABLE_TASK:
+                resultHandler = EditableTaskHandler.getInstance();
+                break;
+            case STATE:
+                resultHandler = StateHandler.getInstance();
                 break;
             default:
                 log.info("忽略命令: [{}]", cmdEnum);
@@ -30,19 +36,19 @@ public class ResultHandlerContext {
     }
 
     public ResultInternal handle(ZhongHeResponse zhongHeResponse) {
-        ResultInternal zhongHeResult = new ResultInternal();
-        zhongHeResult.setOriginalData(zhongHeResponse.getOriginalData());
+        ResultInternal resultInternal = new ResultInternal();
+        resultInternal.setOriginalData(zhongHeResponse.getOriginalData());
         final AcceptEnum acceptEnum = zhongHeResponse.getAcceptEnum();
         if (!acceptEnum.equals(AcceptEnum.SUCCESS)) {
-            zhongHeResult.setSuccess(false);
-            zhongHeResult.setErrorMsg(acceptEnum.getErrorMsg());
+            resultInternal.setSuccess(false);
+            resultInternal.setErrorMsg(acceptEnum.getErrorMsg());
             log.error(acceptEnum.getErrorMsg());
         }
-        zhongHeResult.setSuccess(true);
+        resultInternal.setSuccess(true);
         if (resultHandler != null) {
-            resultHandler.handler(zhongHeResponse);
+            resultHandler.handler(zhongHeResponse, resultInternal);
         }
 
-        return zhongHeResult;
+        return resultInternal;
     }
 }

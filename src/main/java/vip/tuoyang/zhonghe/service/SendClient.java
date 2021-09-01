@@ -12,6 +12,7 @@ import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.service.handler.MyChannelInitializer;
+import vip.tuoyang.zhonghe.support.StateCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
@@ -29,16 +30,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2021/8/24 15:37
  */
 @Slf4j
-class SendClient {
+public class SendClient {
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
     private volatile Channel channel;
     private final ZhongHeConfig zhongHeConfig;
     private final InetSocketAddress inetSocketAddress;
 
-    public SendClient(ZhongHeConfig zhongHeConfig) {
+    private final String label;
+
+    private final StateCallback stateCallback;
+
+    public SendClient(ZhongHeConfig zhongHeConfig, String label, StateCallback stateCallback) {
         this.zhongHeConfig = zhongHeConfig;
         inetSocketAddress = new InetSocketAddress(zhongHeConfig.getMiddleWareIp(), zhongHeConfig.getMiddleWarePort());
         this.startListener();
+        this.label = label;
+        this.stateCallback = stateCallback;
     }
 
     private final ExecutorService executorService = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50), r -> {
@@ -58,7 +65,7 @@ class SendClient {
                 Bootstrap b = new Bootstrap();
                 b.group(group)
                         .channel(NioDatagramChannel.class)
-                        .handler(new MyChannelInitializer());
+                        .handler(new MyChannelInitializer(label, stateCallback, this));
                 channel = b.bind(zhongHeConfig.getLocalBindPort()).sync().channel();
                 channel.closeFuture().await();
             } catch (Exception e) {
@@ -113,7 +120,7 @@ class SendClient {
      */
     public ResultInternal send(CmdEnum cmdEnum, String para, String content) {
         try {
-            SyncResultSupport.cmdResultCountDownMap.get(cmdEnum).reset();
+            SyncResultSupport.labelResultCountDownMap.get(label).reset();
             StringBuilder sb = new StringBuilder();
             // 0 1 2 固定
             sb.append("FEE0A7");
@@ -145,11 +152,11 @@ class SendClient {
             log.info("cmd: [{}], para: [{}], 发送: [{}]", cmdEnum, para, sb.toString());
             getChannel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Objects.requireNonNull(ConvertCode.hexString2Bytes(sb.toString()))), inetSocketAddress));
             try {
-                SyncResultSupport.cmdResultCountDownMap.get(cmdEnum).await();
+                SyncResultSupport.labelResultCountDownMap.get(label).await();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            ResultInternal resultInternal = SyncResultSupport.resultInternal;
+            ResultInternal resultInternal = SyncResultSupport.labelResultInternal.get(label);
             if (resultInternal == null) {
                 log.info("cmd: [{}], para: [{}], 收到: [{}]", cmdEnum, para, "10秒超时");
                 resultInternal = new ResultInternal();
@@ -159,7 +166,7 @@ class SendClient {
 
             return resultInternal;
         } finally {
-            SyncResultSupport.resultInternal = null;
+            SyncResultSupport.labelResultInternal.remove(label);
         }
     }
 

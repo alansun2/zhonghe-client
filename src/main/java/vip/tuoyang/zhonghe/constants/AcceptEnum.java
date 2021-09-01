@@ -15,7 +15,7 @@ public enum AcceptEnum {
     /**
      * 为 1 时表明中间件未上线
      */
-    NOT_ONLINE("01", "中间件未上线"),
+    NOT_ONLINE("01", "服务已掉线"),
     /**
      * 为 1 时表明中间件未运行
      */

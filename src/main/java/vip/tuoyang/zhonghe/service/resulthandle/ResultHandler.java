@@ -1,5 +1,6 @@
 package vip.tuoyang.zhonghe.service.resulthandle;
 
+import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
 
 /**
@@ -8,5 +9,5 @@ import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
  */
 public interface ResultHandler {
 
-    void handler(ZhongHeResponse zhongHeResponse);
+    void handler(ZhongHeResponse zhongHeResponse, ResultInternal resultInternal);
 }

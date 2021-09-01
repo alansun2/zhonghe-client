@@ -1,6 +1,9 @@
 package vip.tuoyang.zhonghe.service;
 
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
+import vip.tuoyang.zhonghe.support.StateCallback;
+import vip.tuoyang.zhonghe.support.SyncResultSupport;
+import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,13 +15,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ZhongHeConnectionManager {
     private final Map<String, ZhongHeClient> labelClientMap = new ConcurrentHashMap<>();
 
+    private final StateCallback stateCallback;
+
+    public ZhongHeConnectionManager(StateCallback stateCallback) {
+        this.stateCallback = stateCallback;
+    }
+
     /**
      * 初始化连接
      */
     public void initConnection(Map<String, ZhongHeConfig> labelConfigMap) {
         labelConfigMap.forEach((label, zhongHeConfig) -> {
-            labelClientMap.put(label, ZhongHeClientImpl.create(zhongHeConfig));
+            labelClientMap.put(label, ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig, label, stateCallback), label));
         });
+
+        SyncResultSupport.initCountDown(labelConfigMap.keySet());
     }
 
     /**
@@ -27,15 +38,25 @@ public class ZhongHeConnectionManager {
     public void addOrResetConnection(String label, ZhongHeConfig zhongHeConfig) {
         final ZhongHeClient zhongHeClient = labelClientMap.get(label);
         if (zhongHeClient != null) {
-            zhongHeClient.close();
+            zhongHeClient.close(true);
         }
-        labelClientMap.put(label, ZhongHeClientImpl.create(zhongHeConfig));
+        labelClientMap.put(label, ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig, label, stateCallback), label));
     }
 
     /**
      * 关闭连接
      */
     public void close() {
-        labelClientMap.forEach((s, zhongHeClient) -> zhongHeClient.close());
+        labelClientMap.forEach((s, zhongHeClient) -> zhongHeClient.close(true));
+    }
+
+    /**
+     * 获取client
+     *
+     * @param label label
+     * @return {@link ZhongHeClient}
+     */
+    public ZhongHeClient getZhongHeClient(String label) {
+        return labelClientMap.get(label);
     }
 }

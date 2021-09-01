@@ -54,11 +54,11 @@ public class GroupDataDownloadHandler implements DownLoadResultHandler {
         } while (contentStr.length() != 0);
 
 
-        ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.downloadParaResultMap.get(para);
+        ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.labelDownloadResultMap.get(para);
         if (zhongHeDownloadResult == null) {
             zhongHeDownloadResult = new ZhongHeDownloadResult();
             zhongHeDownloadResult.setData(groupDataResponseList);
-            SyncResultSupport.downloadParaResultMap.put(para, zhongHeDownloadResult);
+            SyncResultSupport.labelDownloadResultMap.put(para, zhongHeDownloadResult);
         } else {
             final List<GroupDataResponse> data = (List<GroupDataResponse>) zhongHeDownloadResult.getData();
             data.addAll(groupDataResponseList);

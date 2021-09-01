@@ -40,11 +40,11 @@ public class MediaFileDataDownloadHandler implements DownLoadResultHandler {
             return mediaFileDataResponse;
         }).collect(Collectors.toList());
 
-        ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.downloadParaResultMap.get(para);
+        ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.labelDownloadResultMap.get(para);
         if (zhongHeDownloadResult == null) {
             zhongHeDownloadResult = new ZhongHeDownloadResult();
             zhongHeDownloadResult.setData(mediaFileDataResponses);
-            SyncResultSupport.downloadParaResultMap.put(para, zhongHeDownloadResult);
+            SyncResultSupport.labelDownloadResultMap.put(para, zhongHeDownloadResult);
         } else {
             final List<MediaFileDataResponse> data = (List<MediaFileDataResponse>) zhongHeDownloadResult.getData();
             data.addAll(mediaFileDataResponses);

@@ -6,6 +6,7 @@ import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -13,6 +14,8 @@ import java.util.List;
  * @date 2021/8/29 11:13
  */
 public interface ZhongHeClient {
+    SendClient getSendClient();
+
     /**
      * test
      *
@@ -32,7 +35,14 @@ public interface ZhongHeClient {
      *
      * @return {@link ZhongHeResult}
      */
-    ZhongHeResult<?> close();
+    ZhongHeResult<?> close(boolean isCloseChannel);
+
+    /**
+     * 获取中间件状态
+     *
+     * @return 1
+     */
+    ZhongHeResult<Byte> state();
 
     //------------------------------------------task--------------------------------------------------------------------
 
@@ -70,14 +80,6 @@ public interface ZhongHeClient {
     ZhongHeResult<String> addEditableTask(TaskRequest request);
 
     /**
-     * 取消任务
-     *
-     * @param subId subId
-     * @return {@link ZhongHeResult}
-     */
-    ZhongHeResult<?> abortBySubId(String subId);
-
-    /**
      * 终止指定id的任务
      *
      * @param id id
@@ -85,7 +87,26 @@ public interface ZhongHeClient {
      */
     ZhongHeResult<?> abortTaskBySubId(String id);
 
-    //------------------------------download data----------------------------------------------------------------------------
+    //-----------------------------upload-------------------------------------------------------------------------------
+
+    /**
+     * 上传文件
+     *
+     * @param inputStream inputStream
+     * @param fileName    fileName
+     * @return {@link ZhongHeResult}
+     */
+    ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName);
+
+    /**
+     * 删除媒体文件
+     *
+     * @param fileId fileId
+     * @return {@link ZhongHeResult}
+     */
+    ZhongHeResult<?> deleteMediaFile(String fileId, String fileName);
+
+    //------------------------------download data-----------------------------------------------------------------------
 
     /**
      * 获取播放终端列表

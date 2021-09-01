@@ -43,11 +43,11 @@ public class PlayerDataDownloadHandler implements DownLoadResultHandler {
             return terminalDataResponse;
         }).collect(Collectors.toList());
 
-        ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.downloadParaResultMap.get(para);
+        ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.labelDownloadResultMap.get(para);
         if (zhongHeDownloadResult == null) {
             zhongHeDownloadResult = new ZhongHeDownloadResult();
             zhongHeDownloadResult.setData(terminalDataResponses);
-            SyncResultSupport.downloadParaResultMap.put(para, zhongHeDownloadResult);
+            SyncResultSupport.labelDownloadResultMap.put(para, zhongHeDownloadResult);
         } else {
             final List<TerminalDataResponse> data = (List<TerminalDataResponse>) zhongHeDownloadResult.getData();
             data.addAll(terminalDataResponses);

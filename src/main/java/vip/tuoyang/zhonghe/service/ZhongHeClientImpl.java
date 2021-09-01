@@ -13,10 +13,13 @@ import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.service.task.EditableTask;
 import vip.tuoyang.zhonghe.service.task.TimingFileTask;
+import vip.tuoyang.zhonghe.support.StateCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
+import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -35,8 +38,13 @@ public class ZhongHeClientImpl implements ZhongHeClient {
         this.sendClient = sendClient;
     }
 
-    public static ZhongHeClient create(ZhongHeConfig zhongHeConfig) {
-        return new ZhongHeClientImpl(zhongHeConfig, new SendClient(zhongHeConfig));
+    public static ZhongHeClient create(ZhongHeConfig zhongHeConfig, String label, StateCallback stateCallback) {
+        return new ZhongHeClientImpl(zhongHeConfig, new SendClient(zhongHeConfig, label, stateCallback));
+    }
+
+    @Override
+    public SendClient getSendClient() {
+        return sendClient;
     }
 
     /**
@@ -53,7 +61,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public ZhongHeResult<?> initMiddleWare() {
         // 先关闭
-        this.close();
+        this.close(false);
 
         //// 构建初始化数据
         StringBuilder sb = new StringBuilder();
@@ -85,10 +93,23 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * 关闭
      */
     @Override
-    public ZhongHeResult<?> close() {
+    public ZhongHeResult<?> close(boolean isCloseChannel) {
         final ZhongHeResult<Object> objectZhongHeResult = sendClient.send(CmdEnum.CLOSE, "00", null).toZhongHeResult();
-        sendClient.close();
+        if (isCloseChannel) {
+            sendClient.close();
+        }
         return objectZhongHeResult;
+    }
+
+    /**
+     * 获取状态
+     * <p>
+     * 01AA: 正常
+     * 00AA: NAS 挂了
+     */
+    @Override
+    public ZhongHeResult<Byte> state() {
+        return sendClient.send(CmdEnum.STATE, "02", null).toZhongHeResult();
     }
 
     //------------------------------------------task--------------------------------------------------------------------
@@ -140,17 +161,6 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     }
 
     /**
-     * 取消任务
-     *
-     * @param subId subId
-     * @return {@link ZhongHeResult}
-     */
-    @Override
-    public ZhongHeResult<?> abortBySubId(String subId) {
-        return null;
-    }
-
-    /**
      * 终止指定id的任务
      *
      * @param id id
@@ -160,7 +170,37 @@ public class ZhongHeClientImpl implements ZhongHeClient {
         return sendClient.send(CmdEnum.ABORT_TASK_BY_SUB_ID, "00", ServiceUtils.changeOrder(id, 2)).toZhongHeResult();
     }
 
-    //------------------------------download data----------------------------------------------------------------------------
+    //-----------------------------upload-------------------------------------------------------------------------------
+
+    /**
+     * 上传文件
+     *
+     * @param inputStream inputStream
+     * @param fileName    fileName
+     * @return {@link ZhongHeResult}
+     */
+    @Override
+    public ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName) {
+        return null;
+    }
+
+    /**
+     * 删除媒体文件
+     *
+     * @param fileId fileId
+     * @return {@link ZhongHeResult}
+     */
+    @Override
+    public ZhongHeResult<?> deleteMediaFile(String fileId, String fileName) {
+        String fileNameHex = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(fileName)).toUpperCase();
+        if ((fileNameHex.length() | 1) == 1) {
+            fileNameHex = fileNameHex + 0;
+        }
+        String content = ServiceUtils.changeOrder(fileId, 2) + ConvertCode.intToHexString(fileNameHex.length() / 2, 1) + fileNameHex + "00";
+        return sendClient.send(CmdEnum.DELETE_MEDIA_FILE, "00", content).toZhongHeResult();
+    }
+
+    //------------------------------download data-----------------------------------------------------------------------
 
     /**
      * 获取播放终端列表
@@ -195,11 +235,11 @@ public class ZhongHeClientImpl implements ZhongHeClient {
             final ResultInternal resultInternal = sendClient.send(CmdEnum.DOWNLOAD_DATA, para, null);
             if (resultInternal.isSuccess()) {
                 try {
-                    SyncResultSupport.downloadResultDataCountDown.await();
+                    SyncResultSupport.labelDownloadResultDataCountDown.get(ZhongHeClientLockProxy.LABEL_THREAD_LOCAL.get()).await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                final ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.downloadParaResultMap.get(para);
+                final ZhongHeDownloadResult zhongHeDownloadResult = SyncResultSupport.labelDownloadResultMap.get(para);
                 if (zhongHeDownloadResult.isSuccess()) {
                     final List<T> data = (List<T>) zhongHeDownloadResult.getData();
                     zhongHeResult.setData(data);
@@ -212,7 +252,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
                 zhongHeResult.setErrorMsg(resultInternal.getErrorMsg());
             }
         } finally {
-            SyncResultSupport.downloadParaResultMap.remove(para);
+            SyncResultSupport.labelDownloadResultMap.remove(para);
         }
         return zhongHeResult;
     }
