@@ -1,0 +1,22 @@
+server:
+  port: 8084
+  tomcat:
+    max-http-form-post-size: 10MB
+
+spring:
+  application:
+    name: zhonghe-server
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+system:
+  file-dir: D:\opt\zhonghe\file\
+  secret: dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^
+  ip-report-url: http://localhost:8085/common/ip-report
+  label: test
+  ip-report-switch: false

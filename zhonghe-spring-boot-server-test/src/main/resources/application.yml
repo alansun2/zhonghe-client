@@ -1,0 +1,13 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: zhonghe-spring-boot-test-server
+  main:
+    allow-bean-definition-overriding: true
+  profiles:
+    active: dev
+
+system:
+  secret: dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^
