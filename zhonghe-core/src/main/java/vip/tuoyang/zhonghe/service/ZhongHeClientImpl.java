@@ -192,13 +192,13 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * @return 媒体文件 id
      */
     @Override
-    public ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName, String uploadUrl) {
+    public ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName) {
         ZhongHeResult<String> zhongHeResult = new ZhongHeResult<>();
         HttpResponse httpResponse;
         try {
             BasicHeader[] basicHeaders = new BasicHeader[1];
             basicHeaders[0] = new BasicHeader("secret", ZhongHeSystemProperties.secret);
-            uploadUrl = uploadUrl + "?fileName=" + URLEncoder.encode(fileName, Charset.defaultCharset().toString());
+            String uploadUrl = zhongHeConfig.getFileUploadUrl() + "?fileName=" + URLEncoder.encode(fileName, Charset.defaultCharset().toString());
             final InputStreamEntity inputStreamEntity = new InputStreamEntity(inputStream);
             final HttpParams httpParams = HttpParams.builder().url(uploadUrl).httpEntity(inputStreamEntity).headers(basicHeaders).build();
             httpResponse = HttpClientUtils.doPost(httpParams);

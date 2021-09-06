@@ -43,6 +43,7 @@ public class TestService {
         zhongHeConfig.setNasConnectPort(8100);
         zhongHeConfig.setNasControlPort(8101);
         zhongHeConfig.setNasCapturePort(8201);
+        zhongHeConfig.setFileUploadUrl("http://localhost:8084/common/upload-file");
 
         ZhongHeSystemProperties.secret = "dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^";
         ZhongHeConnectionManager zhongHeConnectionManager = new ZhongHeConnectionManager(new StateCallback.DefaultCallback());
@@ -178,7 +179,7 @@ public class TestService {
     @Test
     public void uploadMediaFile() throws FileNotFoundException {
         FileInputStream fileInputStream = new FileInputStream(new File("D:/music/周杰伦 - 园游会.mp3"));
-        final ZhongHeResult<String> zhongHeResult = zhongHeClient.uploadMediaFile(fileInputStream, "周杰伦 - 园游会.mp3", "http://localhost:8084/common/upload-file");
+        final ZhongHeResult<String> zhongHeResult = zhongHeClient.uploadMediaFile(fileInputStream, "周杰伦 - 园游会.mp3");
         System.out.println(zhongHeResult.getData());
     }
 

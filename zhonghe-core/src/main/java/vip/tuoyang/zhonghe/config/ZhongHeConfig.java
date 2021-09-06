@@ -74,6 +74,7 @@ public class ZhongHeConfig {
         AssertUtils.notNull(nasConnectPort, "nasConnectPort 必填");
         AssertUtils.notNull(nasControlPort, "nasControlPort 必填");
         AssertUtils.notNull(nasCapturePort, "nasCapturePort 必填");
+        AssertUtils.notNull(fileUploadUrl, "fileUploadUrl 必填");
 
         AssertUtils.isTrue(CheckUtils.check(middleWareIp, CheckUtils.IPV4), "middleWareIp 格式错误");
         AssertUtils.isTrue(CheckUtils.check(nasIp, CheckUtils.IPV4), "nasIp 格式错误");

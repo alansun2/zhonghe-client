@@ -96,7 +96,7 @@ public interface ZhongHeClient {
      * @param fileName    fileName
      * @return {@link ZhongHeResult}
      */
-    ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName, String uploadUrl);
+    ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName);
 
     /**
      * 删除媒体文件
