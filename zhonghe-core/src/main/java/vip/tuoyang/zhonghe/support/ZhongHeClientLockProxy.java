@@ -1,6 +1,9 @@
 package vip.tuoyang.zhonghe.support;
 
 import vip.tuoyang.base.exception.BizException;
+import vip.tuoyang.zhonghe.bean.ZhongHeResult;
+import vip.tuoyang.zhonghe.bean.response.StateResponse;
+import vip.tuoyang.zhonghe.constants.StateEnum;
 import vip.tuoyang.zhonghe.service.SendClient;
 import vip.tuoyang.zhonghe.service.ZhongHeClient;
 
@@ -38,6 +41,13 @@ public class ZhongHeClientLockProxy implements InvocationHandler {
         LABEL_THREAD_LOCAL.set(label);
         reentrantLock.lock();
         try {
+            if (!"state".equals(method.getName())) {
+                final ZhongHeResult<StateResponse> state = proxyed.state();
+                if (!state.getData().getState().equals(StateEnum.ONLINE_RUNNING)) {
+                    throw new BizException(state.getData().getState().getDesc());
+                }
+            }
+
             return method.invoke(proxyed, args);
         } finally {
             reentrantLock.unlock();

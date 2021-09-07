@@ -1,7 +1,7 @@
 package vip.tuoyang.zhonghe.service;
 
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
-import vip.tuoyang.zhonghe.support.StateCallback;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 
@@ -15,9 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ZhongHeConnectionManager {
     private final Map<String, ZhongHeClient> labelClientMap = new ConcurrentHashMap<>();
 
-    private final StateCallback stateCallback;
+    private final ZhongHeCallback stateCallback;
 
-    public ZhongHeConnectionManager(StateCallback stateCallback) {
+    public ZhongHeConnectionManager(ZhongHeCallback stateCallback) {
         this.stateCallback = stateCallback;
     }
 

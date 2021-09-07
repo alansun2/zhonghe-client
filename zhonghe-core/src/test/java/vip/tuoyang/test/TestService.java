@@ -11,7 +11,7 @@ import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.config.ZhongHeSystemProperties;
 import vip.tuoyang.zhonghe.service.ZhongHeClient;
 import vip.tuoyang.zhonghe.service.ZhongHeConnectionManager;
-import vip.tuoyang.zhonghe.support.StateCallback;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +31,7 @@ public class TestService {
     @BeforeAll
     public static void before() throws InterruptedException {
         ZhongHeConfig zhongHeConfig = new ZhongHeConfig();
-        String localIp = "192.168.166.153";
+        String localIp = "192.168.166.151";
         zhongHeConfig.setLocalBindPort(7660);
         zhongHeConfig.setDeviceDes("Alan本地");
         zhongHeConfig.setDeviceId("00001011");
@@ -46,7 +46,7 @@ public class TestService {
         zhongHeConfig.setFileUploadUrl("http://localhost:8084/common/upload-file");
 
         ZhongHeSystemProperties.secret = "dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^";
-        ZhongHeConnectionManager zhongHeConnectionManager = new ZhongHeConnectionManager(new StateCallback.DefaultCallback());
+        ZhongHeConnectionManager zhongHeConnectionManager = new ZhongHeConnectionManager(new ZhongHeCallback.DefaultCallback());
         zhongHeConnectionManager.initConnection(Collections.singletonMap("test", zhongHeConfig));
         zhongHeClient = zhongHeConnectionManager.getZhongHeClient("test");
         Thread.sleep(2000);
@@ -60,6 +60,12 @@ public class TestService {
     @Test
     public void state() {
         zhongHeClient.state();
+//        LockSupport.park();
+    }
+
+    @Test
+    public void test() {
+        zhongHeClient.test();
         LockSupport.park();
     }
 

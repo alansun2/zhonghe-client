@@ -4,13 +4,11 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
-import vip.tuoyang.zhonghe.utils.ConvertCode;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
 
 /**
  * @author AlanSun

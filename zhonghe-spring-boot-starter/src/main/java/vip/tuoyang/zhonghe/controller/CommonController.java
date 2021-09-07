@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.request.IpChangeRequest;
+import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 import vip.tuoyang.zhonghe.service.CommonService;
 
@@ -20,12 +21,23 @@ public class CommonController {
     private ServiceSystemProperties serviceSystemProperties;
 
     /**
+     * 服务初始化
+     *
+     * @param zhongHeConfig {@link ZhongHeConfig}
+     */
+    @PostMapping(value = "/server-init")
+    public void serverInit(@RequestBody ZhongHeConfig zhongHeConfig, @RequestHeader String secret) {
+        AssertUtils.isTrue(serviceSystemProperties.getSecret().equals(secret), "密码不正确");
+        commonService.serverInit(zhongHeConfig);
+    }
+
+    /**
      * 公网 ip
      *
      * @param request {@link IpChangeRequest}
      */
     @PostMapping(value = "/ip-report")
-    public void ipReport(@RequestBody IpChangeRequest request, @RequestHeader() String secret) {
+    public void ipReport(@RequestBody IpChangeRequest request, @RequestHeader String secret) {
         AssertUtils.isTrue(serviceSystemProperties.getSecret().equals(secret), "密码不正确");
         commonService.ipChangeHandle(request);
     }

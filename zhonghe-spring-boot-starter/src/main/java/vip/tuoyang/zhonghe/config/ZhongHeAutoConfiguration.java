@@ -20,5 +20,6 @@ public class ZhongHeAutoConfiguration {
     @PostConstruct
     public void init() {
         ZhongHeSystemProperties.secret = serviceSystemProperties.getSecret();
+        ZhongHeSystemProperties.timeout = serviceSystemProperties.getTimeout();
     }
 }

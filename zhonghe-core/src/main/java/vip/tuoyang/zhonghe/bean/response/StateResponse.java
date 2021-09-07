@@ -2,6 +2,7 @@ package vip.tuoyang.zhonghe.bean.response;
 
 import lombok.Getter;
 import lombok.Setter;
+import vip.tuoyang.zhonghe.constants.StateEnum;
 
 /**
  * @author AlanSun
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Setter
 public class StateResponse {
 
-    private boolean isOnline = false;
+    private StateEnum state;
     /**
      * 是否正忙
      */

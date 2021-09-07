@@ -3,6 +3,7 @@ package vip.tuoyang.zhonghe.support;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
+import vip.tuoyang.zhonghe.constants.StateEnum;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
 /**
@@ -38,8 +39,8 @@ public class SendStateHandler {
      *
      * @return true: 在线; false：下线
      */
-    public boolean isOnline() {
-        return "01AA".equals(zhongHeResponse.getContent().substring(0, 4));
+    public StateEnum isOnline() {
+        return StateEnum.valueBy(zhongHeResponse.getContent().substring(0, 4));
     }
 
     /**

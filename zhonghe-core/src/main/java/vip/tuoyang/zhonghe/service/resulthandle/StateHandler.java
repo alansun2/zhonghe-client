@@ -23,7 +23,7 @@ public class StateHandler implements ResultHandler {
     public void handler(ZhongHeResponse zhongHeResponse, ResultInternal resultInternal) {
         SendStateHandler sendStateHandler = new SendStateHandler(zhongHeResponse);
         StateResponse stateResponse = new StateResponse();
-        stateResponse.setOnline(sendStateHandler.isOnline());
+        stateResponse.setState(sendStateHandler.isOnline());
         resultInternal.setData(stateResponse);
     }
 }

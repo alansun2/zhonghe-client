@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author AlanSun
  * @date 2021/9/1 15:23
  */
-public interface StateCallback {
+public interface ZhongHeCallback {
     /**
      * 广播服务状态修改时回调
      *
@@ -16,7 +16,7 @@ public interface StateCallback {
     void callback(String label, SendStateHandler stateHandler);
 
     @Slf4j
-    class DefaultCallback implements StateCallback {
+    class DefaultCallback implements ZhongHeCallback {
 
         /**
          * 广播服务状态修改时回调

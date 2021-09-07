@@ -18,4 +18,8 @@ public class ServiceSystemProperties {
      * 请求密码
      */
     private String secret;
+    /**
+     * 超时时间
+     */
+    public int timeout = 5;
 }

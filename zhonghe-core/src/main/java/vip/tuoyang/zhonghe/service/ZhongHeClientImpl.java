@@ -8,6 +8,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.HttpClientUtils;
 import vip.tuoyang.base.util.bean.HttpParams;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
@@ -16,13 +17,16 @@ import vip.tuoyang.zhonghe.bean.ZhongHeResult;
 import vip.tuoyang.zhonghe.bean.request.TaskRequest;
 import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
+import vip.tuoyang.zhonghe.bean.response.StateResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.config.ZhongHeSystemProperties;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
+import vip.tuoyang.zhonghe.constants.StateEnum;
+import vip.tuoyang.zhonghe.exception.TimeOutException;
 import vip.tuoyang.zhonghe.service.task.EditableTask;
 import vip.tuoyang.zhonghe.service.task.TimingFileTask;
-import vip.tuoyang.zhonghe.support.StateCallback;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
@@ -33,6 +37,8 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author AlanSun
@@ -44,19 +50,32 @@ public class ZhongHeClientImpl implements ZhongHeClient {
 
     private final SendClient sendClient;
 
-    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig, SendClient sendClient) {
+    private final ZhongHeCallback callback;
+
+    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig, ZhongHeCallback callback, SendClient sendClient) {
         zhongHeConfig.valid();
         this.zhongHeConfig = zhongHeConfig;
         this.sendClient = sendClient;
+        this.callback = callback;
     }
 
-    public static ZhongHeClient create(ZhongHeConfig zhongHeConfig, String label, StateCallback stateCallback) {
-        return new ZhongHeClientImpl(zhongHeConfig, new SendClient(zhongHeConfig, label, stateCallback));
+    public static ZhongHeClient create(ZhongHeConfig zhongHeConfig, String label, ZhongHeCallback callback) {
+        return new ZhongHeClientImpl(zhongHeConfig, callback, new SendClient(zhongHeConfig, label, callback));
     }
 
     @Override
     public SendClient getSendClient() {
         return sendClient;
+    }
+
+    @Override
+    public ZhongHeCallback getCallback() {
+        return callback;
+    }
+
+    @Override
+    public ZhongHeConfig getZhongHeConfig() {
+        return zhongHeConfig;
     }
 
     /**
@@ -120,8 +139,34 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * 00AA: NAS 挂了
      */
     @Override
-    public ZhongHeResult<Byte> state() {
-        return sendClient.send(CmdEnum.STATE, "02", null).toZhongHeResult();
+    public ZhongHeResult<StateResponse> state() {
+        int retryCount = 3;
+        ZhongHeResult<StateResponse> zhongHeResult = null;
+        do {
+            try {
+                zhongHeResult = sendClient.send(CmdEnum.STATE, "02", null).toZhongHeResult();
+            } catch (Exception e) {
+                if (e instanceof TimeOutException) {
+                    if (retryCount == 2) {
+                        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
+                        this.initMiddleWare();
+                    }
+                } else {
+                    throw e;
+                }
+                retryCount--;
+            }
+        } while (zhongHeResult == null && retryCount > 0);
+
+        if(zhongHeResult == null){
+            throw new BizException("获取状态异常");
+        }
+
+        if (zhongHeResult.getData().getState().equals(StateEnum.OFFLINE_DOWN)) {
+            this.initMiddleWare();
+            zhongHeResult = this.state();
+        }
+        return zhongHeResult;
     }
 
     //------------------------------------------task--------------------------------------------------------------------

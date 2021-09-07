@@ -11,7 +11,7 @@ import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.service.SendClient;
 import vip.tuoyang.zhonghe.service.resulthandle.ResultHandlerContext;
 import vip.tuoyang.zhonghe.support.SendStateHandler;
-import vip.tuoyang.zhonghe.support.StateCallback;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
@@ -25,11 +25,11 @@ public class MyClientHandler extends SimpleChannelInboundHandler<DatagramPacket>
 
     private final String label;
 
-    private final StateCallback stateCallback;
+    private final ZhongHeCallback stateCallback;
 
     private final SendClient sendClient;
 
-    public MyClientHandler(String label, StateCallback stateCallback, SendClient sendClient) {
+    public MyClientHandler(String label, ZhongHeCallback stateCallback, SendClient sendClient) {
         this.label = label;
         this.stateCallback = stateCallback;
         this.sendClient = sendClient;

@@ -1,8 +1,7 @@
-package vip.tuoyang.zhonghe.config;
+package vip.tuoyang.zhonghe.bean;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.base.util.CheckUtils;
 
@@ -10,7 +9,6 @@ import vip.tuoyang.base.util.CheckUtils;
  * @author AlanSun
  * @date 2021/8/22 12:52
  */
-@ToString
 @Getter
 @Setter
 public class ZhongHeConfig {
@@ -22,10 +20,6 @@ public class ZhongHeConfig {
      * 管理码
      */
     private String managerCode;
-    /**
-     * 本地绑定端口
-     */
-    private Integer localBindPort;
     /**
      * 设备描述
      */
@@ -61,10 +55,6 @@ public class ZhongHeConfig {
      * 2048～48000
      */
     private Integer nasCapturePort = 8201;
-    /**
-     * 文件上传地址
-     */
-    private String fileUploadUrl;
 
     private String label;
 
@@ -73,18 +63,13 @@ public class ZhongHeConfig {
     public void valid() {
         AssertUtils.notBlank(deviceId, "deviceId 必填");
         AssertUtils.notBlank(managerCode, "managerCode 必填");
-        AssertUtils.notNull(localBindPort, "localBindPort 必填");
         AssertUtils.notBlank(deviceDes, "deviceDes 必填");
-        AssertUtils.notBlank(middleWareIp, "middleWareIp 必填");
-        AssertUtils.notBlank(nasIp, "nasIp 必填");
         AssertUtils.notNull(nasConnectPort, "nasConnectPort 必填");
         AssertUtils.notNull(nasControlPort, "nasControlPort 必填");
         AssertUtils.notNull(nasCapturePort, "nasCapturePort 必填");
-        AssertUtils.notNull(fileUploadUrl, "fileUploadUrl 必填");
+        AssertUtils.notNull(label, "label 必填");
+        AssertUtils.notNull(deviceAddress, "deviceAddress 必填");
 
-        AssertUtils.isTrue(CheckUtils.check(middleWareIp, CheckUtils.IPV4), "middleWareIp 格式错误");
-        AssertUtils.isTrue(CheckUtils.check(nasIp, CheckUtils.IPV4), "nasIp 格式错误");
-
-        AssertUtils.isTrue(CheckUtils.portCheck(localBindPort, middleWarePort, nasConnectPort, nasControlPort, nasCapturePort), "请检查端口范围，0~65535");
+        AssertUtils.isTrue(CheckUtils.portCheck(middleWarePort, nasConnectPort, nasControlPort, nasCapturePort), "请检查端口范围，0~65535");
     }
 }

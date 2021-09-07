@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import vip.tuoyang.base.util.HttpClientUtils;
 import vip.tuoyang.base.util.IpUtils;
 import vip.tuoyang.base.util.bean.HttpParams;
+import vip.tuoyang.zhonghe.bean.ZhongHeConfig;
 import vip.tuoyang.zhonghe.bean.request.IpChangeRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
@@ -37,12 +38,13 @@ public class IpSchedule {
     public void ipChangeListen() {
         final String publicIp = IpUtils.getPublicIp();
         if (lastIp == null || !lastIp.equals(publicIp)) {
+            final ZhongHeConfig zhongHeConfig = serviceSystemProperties.getZhongHeConfig();
             IpChangeRequest ipChangeRequest = new IpChangeRequest();
             ipChangeRequest.setIp(publicIp);
-            ipChangeRequest.setLabel(serviceSystemProperties.getLabel());
+            ipChangeRequest.setLabel(zhongHeConfig.getLabel());
             try {
                 final HttpParams.HttpParamsBuilder builder = HttpParams.builder().headers(ArrayUtils.toArray(new BasicHeader("secret", serviceSystemProperties.getSecret())))
-                        .url(serviceSystemProperties.getIpReportUrl())
+                        .url(serviceSystemProperties.getServerUrl() + serviceSystemProperties.getPath().getIpChange())
                         .httpEntity(new StringEntity(objectMapper.writeValueAsString(ipChangeRequest), ContentType.APPLICATION_JSON));
                 final HttpResponse httpResponse = HttpClientUtils.doPost(builder.build());
                 final StatusLine statusLine = httpResponse.getStatusLine();

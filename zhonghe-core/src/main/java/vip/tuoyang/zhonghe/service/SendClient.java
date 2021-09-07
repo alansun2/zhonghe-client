@@ -10,9 +10,11 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import lombok.extern.slf4j.Slf4j;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
+import vip.tuoyang.zhonghe.config.ZhongHeSystemProperties;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
+import vip.tuoyang.zhonghe.exception.TimeOutException;
 import vip.tuoyang.zhonghe.service.handler.MyChannelInitializer;
-import vip.tuoyang.zhonghe.support.StateCallback;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
@@ -24,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author AlanSun
@@ -38,37 +41,41 @@ public class SendClient {
 
     private final String label;
 
-    private final StateCallback stateCallback;
+    private final ZhongHeCallback callback;
 
-    public SendClient(ZhongHeConfig zhongHeConfig, String label, StateCallback stateCallback) {
+    private EventLoopGroup group;
+
+    private final ExecutorService executorService;
+
+    public SendClient(ZhongHeConfig zhongHeConfig, String label, ZhongHeCallback callback) {
         this.zhongHeConfig = zhongHeConfig;
         inetSocketAddress = new InetSocketAddress(zhongHeConfig.getMiddleWareIp(), zhongHeConfig.getMiddleWarePort());
-        this.startListener();
         this.label = label;
-        this.stateCallback = stateCallback;
+        this.callback = callback;
+        executorService = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50), r -> {
+            Thread thread = new Thread(r);
+            thread.setName("zhonghe-client-channel-start_" + label);
+            thread.setDaemon(false);
+            return thread;
+        });
     }
 
-    private final ExecutorService executorService = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50), r -> {
-        Thread thread = new Thread(r);
-        thread.setName("zhonghe-client-channel-start");
-        thread.setDaemon(false);
-        return thread;
-    });
 
     /**
      * 启动客户端监听
      */
     private void startListener() {
         executorService.execute(() -> {
-            EventLoopGroup group = new NioEventLoopGroup();
+            group = new NioEventLoopGroup();
             try {
                 Bootstrap b = new Bootstrap();
                 b.group(group)
                         .channel(NioDatagramChannel.class)
-                        .handler(new MyChannelInitializer(label, stateCallback, this));
+                        .handler(new MyChannelInitializer(label, callback, this));
                 channel = b.bind(zhongHeConfig.getLocalBindPort()).sync().channel();
                 channel.closeFuture().await();
             } catch (Exception e) {
+                // Address already in use: bind
                 log.error("启动中河客户端失败", e);
             } finally {
                 group.shutdownGracefully();
@@ -82,24 +89,19 @@ public class SendClient {
      * @return {@link Channel}
      */
     private Channel getChannel() {
-        if (channel == null) {
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (channel == null) {
-                try {
+        while (channel == null) {
+            synchronized (atomicInteger) {
+                if (channel == null) {
                     this.startListener();
-                } catch (Exception e) {
-                    log.warn("启动客户端失败");
+                    LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
                 }
             }
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        }
+
+        if (!channel.isActive()) {
+            group.shutdownGracefully();
+            channel = null;
+            this.getChannel();
         }
 
         return channel;
@@ -152,16 +154,14 @@ public class SendClient {
             log.info("cmd: [{}], para: [{}], 发送: [{}]", cmdEnum, para, sb.toString());
             getChannel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Objects.requireNonNull(ConvertCode.hexString2Bytes(sb.toString()))), inetSocketAddress));
             try {
-                SyncResultSupport.labelResultCountDownMap.get(label).await();
+                SyncResultSupport.labelResultCountDownMap.get(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error("终端异常", e);
             }
             ResultInternal resultInternal = SyncResultSupport.labelResultInternal.get(label);
             if (resultInternal == null) {
                 log.info("cmd: [{}], para: [{}], 收到: [{}]", cmdEnum, para, "10秒超时");
-                resultInternal = new ResultInternal();
-                resultInternal.setSuccess(false);
-                resultInternal.setErrorMsg("超时");
+                throw new TimeOutException();
             }
 
             return resultInternal;

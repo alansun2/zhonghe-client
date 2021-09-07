@@ -5,7 +5,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import vip.tuoyang.zhonghe.service.SendClient;
-import vip.tuoyang.zhonghe.support.StateCallback;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 
 /**
  * @author AlanSun
@@ -15,11 +15,11 @@ public class MyChannelInitializer extends ChannelInitializer<NioDatagramChannel>
 
     private final String label;
 
-    private final StateCallback stateCallback;
+    private final ZhongHeCallback stateCallback;
 
     private final SendClient sendClient;
 
-    public MyChannelInitializer(String label, StateCallback stateCallback, SendClient sendClient) {
+    public MyChannelInitializer(String label, ZhongHeCallback stateCallback, SendClient sendClient) {
         this.label = label;
         this.stateCallback = stateCallback;
         this.sendClient = sendClient;

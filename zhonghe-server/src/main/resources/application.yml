@@ -17,6 +17,6 @@ spring:
 system:
   file-dir: D:\opt\zhonghe\file\
   secret: dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^
-  ip-report-url: http://localhost:8085/common/ip-report
+  ip-report-url: http://localhost:28083/common/ip-report
   label: test
   ip-report-switch: false

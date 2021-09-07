@@ -14,4 +14,8 @@ public class ZhongHeSystemProperties {
      * 请求密码
      */
     public static String secret;
+    /**
+     * 超时时间,单位秒
+     */
+    public static int timeout = 5;
 }
