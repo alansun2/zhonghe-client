@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import vip.tuoyang.base.util.HttpClientUtils;
 import vip.tuoyang.base.util.IpUtils;
 import vip.tuoyang.base.util.bean.HttpParams;
-import vip.tuoyang.zhonghe.bean.ZhongHeConfig;
 import vip.tuoyang.zhonghe.bean.request.IpChangeRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
@@ -38,7 +37,7 @@ public class IpSchedule {
     public void ipChangeListen() {
         final String publicIp = IpUtils.getPublicIp();
         if (lastIp == null || !lastIp.equals(publicIp)) {
-            final ZhongHeConfig zhongHeConfig = serviceSystemProperties.getZhongHeConfig();
+            final ServiceSystemProperties.ZhongHeConfig zhongHeConfig = serviceSystemProperties.getZhongHeConfig();
             IpChangeRequest ipChangeRequest = new IpChangeRequest();
             ipChangeRequest.setIp(publicIp);
             ipChangeRequest.setLabel(zhongHeConfig.getLabel());

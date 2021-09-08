@@ -15,8 +15,13 @@ spring:
       max-file-size: 10MB
 
 system:
-  file-dir: D:\opt\zhonghe\file\
-  secret: dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^
-  ip-report-url: http://localhost:28083/common/ip-report
-  label: test
   ip-report-switch: false
+  server-url: http://localhost:28083
+  zhong-he-config:
+    label: 330482098
+    device-id: 00001011
+    device-des: Alan测试
+    device-address: 设备测试学校
+    manager-code: 12345668
+    nas-ip: 192.168.166.152
+    middle-ware-ip: 192.168.166.152
