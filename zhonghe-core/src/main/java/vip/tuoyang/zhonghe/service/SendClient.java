@@ -8,6 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import lombok.extern.slf4j.Slf4j;
+import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.ThreadUtils;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
@@ -94,7 +95,8 @@ public class SendClient {
      * @return {@link Channel}
      */
     public Channel getChannel() {
-        while (channel == null) {
+        int retryCount = 10;
+        while (channel == null && retryCount > 0) {
             synchronized (atomicInteger) {
                 if (channel == null) {
                     this.startListener();
@@ -107,6 +109,11 @@ public class SendClient {
                     }
                 }
             }
+            retryCount--;
+        }
+
+        if (channel == null) {
+            throw new BizException("获取 channel 失败");
         }
 
         if (!channel.isActive()) {
