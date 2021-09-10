@@ -2,6 +2,7 @@ package vip.tuoyang.zhonghe.service.resulthandle;
 
 import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
+import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
 /**
  * @author AlanSun
@@ -19,6 +20,6 @@ public class EditableTaskHandler implements ResultHandler {
 
     @Override
     public void handler(ZhongHeResponse zhongHeResponse, ResultInternal resultInternal) {
-        resultInternal.setData(zhongHeResponse.getContent());
+        resultInternal.setData(ServiceUtils.changeOrder(zhongHeResponse.getContent(), 2));
     }
 }
