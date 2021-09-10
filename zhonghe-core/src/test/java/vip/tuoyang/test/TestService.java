@@ -6,6 +6,7 @@ import vip.tuoyang.zhonghe.bean.ZhongHeResult;
 import vip.tuoyang.zhonghe.bean.request.TaskRequest;
 import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
+import vip.tuoyang.zhonghe.bean.response.StateResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.config.ZhongHeSystemProperties;
@@ -31,8 +32,8 @@ public class TestService {
     @BeforeAll
     public static void before() throws InterruptedException {
         ZhongHeConfig zhongHeConfig = new ZhongHeConfig();
-        String localIp = "192.168.166.151";
-        zhongHeConfig.setLocalBindPort(7660);
+        String localIp = "192.168.166.153";
+        zhongHeConfig.setLocalBindPort(7000);
         zhongHeConfig.setDeviceDes("Alan本地");
         zhongHeConfig.setDeviceId("00001011");
         zhongHeConfig.setManagerCode("12345668");
@@ -58,9 +59,15 @@ public class TestService {
     }
 
     @Test
+    public void close() {
+        zhongHeClient.close(false);
+    }
+
+    @Test
     public void state() {
-        zhongHeClient.state();
-//        LockSupport.park();
+        final ZhongHeResult<StateResponse> zhongHeResult = zhongHeClient.state();
+        System.out.println("测试 state: " + zhongHeResult);
+        LockSupport.park();
     }
 
     @Test
@@ -101,14 +108,15 @@ public class TestService {
         TaskRequest request = new TaskRequest();
         request.setTaskType((byte) 0);
         request.setTaskName("test");
-        request.setPlayMode((byte) 0);
-        request.setStartTime(LocalDateTime.of(2021, 9, 1, 0, 0, 0));
-        request.setEndTime(LocalDateTime.of(2021, 9, 1, 0, 10, 0));
-        request.setTimeType((byte) 1);
+        request.setPlayMode((byte) 3);
+        request.setCount((byte) 2);
+        request.setStartTime(LocalDateTime.of(2000, 1, 1, 23, 0, 0));
+        request.setEndTime(LocalDateTime.of(2021, 9, 9, 23, 10, 0));
         request.setTimeMode((byte) 0);
-        request.setWeekOption("1,2,5");
+        request.setTimeType((byte) 1);
+        request.setWeekOption("1,3");
         request.setPlayContentIdList(Collections.singletonList("0001"));
-        request.setPlayObjectIdList(Collections.singletonList("00001000"));
+        request.setPlayObjectIdList(Collections.singletonList("FFFFFF01"));
         final ZhongHeResult<String> stringZhongHeResult = zhongHeClient.addTimingTask(request);
         System.out.println(stringZhongHeResult.getData());
     }
@@ -149,7 +157,7 @@ public class TestService {
     public void instantTask() {
         TaskRequest request = new TaskRequest();
         request.setTaskType((byte) 0);
-        request.setTaskName("test2");
+        request.setTaskName("test");
         request.setPlayMode((byte) 3);
         request.setCount((byte) 2);
         request.setTimeMode((byte) 2);
@@ -164,13 +172,13 @@ public class TestService {
     public void instantTask1() {
         TaskRequest request = new TaskRequest();
         request.setTaskType((byte) 0);
-        request.setTaskName("test3");
+        request.setTaskName("test");
         request.setPlayMode((byte) 3);
-        request.setVolume(3);
+//        request.setCount((byte) 2);
         request.setTimeMode((byte) 1);
         request.setTimeType((byte) 1);
-        request.setStartTime(LocalDateTime.of(2021, 9, 1, 15, 30, 0));
-        request.setEndTime(LocalDateTime.of(2021, 9, 1, 15, 40, 0));
+        request.setStartTime(LocalDateTime.of(2021, 9, 10, 15, 30, 0));
+        request.setEndTime(LocalDateTime.of(2021, 9, 10, 15, 40, 0));
         request.setPlayContentIdList(Collections.singletonList("0001"));
         request.setPlayObjectIdList(Collections.singletonList("FFFFFF01"));
         final ZhongHeResult<String> stringZhongHeResult = zhongHeClient.addEditableTask(request);

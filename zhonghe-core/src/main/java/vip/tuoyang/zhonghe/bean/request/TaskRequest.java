@@ -155,14 +155,14 @@ public class TaskRequest {
 
     public String getStartTime() {
         if (startTime == null) {
-            return "000000000000";
+            return "000101000000";
         }
         return ServiceUtils.localDateTimeToHex(startTime);
     }
 
     public String getEndTime() {
         if (endTime == null) {
-            return "000000000000";
+            return "000101000000";
         }
         return ServiceUtils.localDateTimeToHex(endTime);
     }

@@ -19,17 +19,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ZhongHeClientLockProxy implements InvocationHandler {
     private final ZhongHeClient proxyed;
 
-    private final String label;
-
-    public ZhongHeClientLockProxy(ZhongHeClient proxyed, String label) {
+    public ZhongHeClientLockProxy(ZhongHeClient proxyed) {
         this.proxyed = proxyed;
-        this.label = label;
     }
 
     private final ReentrantLock reentrantLock = new ReentrantLock();
 
     public static final ThreadLocal<SendClient> ZHONG_HE_CLIENT_THREAD_LOCAL = new InheritableThreadLocal<>();
-    public static final ThreadLocal<String> LABEL_THREAD_LOCAL = new InheritableThreadLocal<>();
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -38,10 +34,9 @@ public class ZhongHeClientLockProxy implements InvocationHandler {
             throw new BizException("系统繁忙请稍后再试");
         }
         ZHONG_HE_CLIENT_THREAD_LOCAL.set(proxyed.getSendClient());
-        LABEL_THREAD_LOCAL.set(label);
         reentrantLock.lock();
         try {
-            if (!"state".equals(method.getName())) {
+            if (!"state".equals(method.getName()) && !"close".equals(method.getName())) {
                 final ZhongHeResult<StateResponse> state = proxyed.state();
                 if (!state.getData().getState().equals(StateEnum.ONLINE_RUNNING)) {
                     throw new BizException(state.getData().getState().getDesc());
@@ -52,11 +47,10 @@ public class ZhongHeClientLockProxy implements InvocationHandler {
         } finally {
             reentrantLock.unlock();
             ZHONG_HE_CLIENT_THREAD_LOCAL.remove();
-            LABEL_THREAD_LOCAL.remove();
         }
     }
 
     public static ZhongHeClient getProxy(ZhongHeClient zhongTaiClient, String label) {
-        return (ZhongHeClient) Proxy.newProxyInstance(zhongTaiClient.getClass().getClassLoader(), zhongTaiClient.getClass().getInterfaces(), new ZhongHeClientLockProxy(zhongTaiClient, label));
+        return (ZhongHeClient) Proxy.newProxyInstance(zhongTaiClient.getClass().getClassLoader(), zhongTaiClient.getClass().getInterfaces(), new ZhongHeClientLockProxy(zhongTaiClient));
     }
 }

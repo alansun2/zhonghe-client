@@ -1,12 +1,14 @@
 package vip.tuoyang.test;
 
 import org.junit.jupiter.api.Test;
+import vip.tuoyang.zhonghe.support.CountDownLatch2;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author AlanSun
@@ -26,8 +28,7 @@ public class Test1 {
 
     @Test
     public void textTest() throws UnsupportedEncodingException {
-        String a = "D6DCBDDCC2D7202D20D3CED4B0" +
-                "BBE12E6D70";
+        String a = "B8E8B3AAD7E6B9FA2E6D7033";
         System.out.println(ServiceUtils.getContentFromHex(a));
 //        final String gbk = new String(Objects.requireNonNull(ConvertCode.hexString2Bytes(a.replace(" ", ""))), "UTF-8");
 //        System.out.println(gbk);
@@ -139,5 +140,12 @@ public class Test1 {
         final String s = "FE E0 A7 8A  11 10 00 00  B6 0E 05 00  0D 03 00 09 00 00 00 00 06";
         final int i = ServiceUtils.computeChkSum(s.replace(" ", ""));
         System.out.println(i);
+    }
+
+    @Test
+    public void countDownTest() throws InterruptedException {
+        CountDownLatch2 countDownLatch = new CountDownLatch2(1);
+        countDownLatch.countDown();
+        countDownLatch.await();
     }
 }

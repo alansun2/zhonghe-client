@@ -2,12 +2,14 @@ package vip.tuoyang.zhonghe.bean.response;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import vip.tuoyang.zhonghe.constants.StateEnum;
 
 /**
  * @author AlanSun
  * @date 2021/9/1 16:28
  */
+@ToString
 @Getter
 @Setter
 public class StateResponse {

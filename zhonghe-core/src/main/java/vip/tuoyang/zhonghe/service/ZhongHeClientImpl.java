@@ -26,9 +26,8 @@ import vip.tuoyang.zhonghe.constants.StateEnum;
 import vip.tuoyang.zhonghe.exception.TimeOutException;
 import vip.tuoyang.zhonghe.service.task.EditableTask;
 import vip.tuoyang.zhonghe.service.task.TimingFileTask;
-import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
-import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
@@ -52,30 +51,23 @@ public class ZhongHeClientImpl implements ZhongHeClient {
 
     private final ZhongHeCallback callback;
 
-    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig, ZhongHeCallback callback, SendClient sendClient) {
+    private final String label;
+
+    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig, ZhongHeCallback callback, SendClient sendClient, String label) {
         zhongHeConfig.valid();
         this.zhongHeConfig = zhongHeConfig;
         this.sendClient = sendClient;
         this.callback = callback;
+        this.label = label;
     }
 
     public static ZhongHeClient create(ZhongHeConfig zhongHeConfig, String label, ZhongHeCallback callback) {
-        return new ZhongHeClientImpl(zhongHeConfig, callback, new SendClient(zhongHeConfig, label, callback));
+        return new ZhongHeClientImpl(zhongHeConfig, callback, new SendClient(zhongHeConfig, label, callback), label);
     }
 
     @Override
     public SendClient getSendClient() {
         return sendClient;
-    }
-
-    @Override
-    public ZhongHeCallback getCallback() {
-        return callback;
-    }
-
-    @Override
-    public ZhongHeConfig getZhongHeConfig() {
-        return zhongHeConfig;
     }
 
     /**
@@ -125,11 +117,21 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<?> close(boolean isCloseChannel) {
-        final ZhongHeResult<Object> objectZhongHeResult = sendClient.send(CmdEnum.CLOSE, "00", null).toZhongHeResult();
-        if (isCloseChannel) {
-            sendClient.close();
+        try {
+            return sendClient.send(CmdEnum.CLOSE, "00", null).toZhongHeResult();
+        } catch (Exception e) {
+            if (e instanceof TimeOutException) {
+                log.warn("close 超时异常，可能未初始化: label: [{}]", zhongHeConfig.getLabel());
+                ZhongHeResult<Object> zhongHeResult = new ZhongHeResult<>();
+                zhongHeResult.setSuccess(false);
+                return zhongHeResult;
+            }
+            throw e;
+        } finally {
+            if (isCloseChannel) {
+                sendClient.close();
+            }
         }
-        return objectZhongHeResult;
     }
 
     /**
@@ -158,12 +160,13 @@ public class ZhongHeClientImpl implements ZhongHeClient {
             }
         } while (zhongHeResult == null && retryCount > 0);
 
-        if(zhongHeResult == null){
+        if (zhongHeResult == null) {
             throw new BizException("获取状态异常");
         }
 
         if (zhongHeResult.getData().getState().equals(StateEnum.OFFLINE_DOWN)) {
             this.initMiddleWare();
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
             zhongHeResult = this.state();
         }
         return zhongHeResult;
@@ -331,10 +334,11 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     private <T> ZhongHeResult<List<T>> getDownloadData(String para) {
         ZhongHeResult<List<T>> zhongHeResult = new ZhongHeResult<>();
         try {
+            SyncResultSupport.labelDownloadResultDataCountDown.get(label).reset();
             final ResultInternal resultInternal = sendClient.send(CmdEnum.DOWNLOAD_DATA, para, null);
             if (resultInternal.isSuccess()) {
                 try {
-                    SyncResultSupport.labelDownloadResultDataCountDown.get(ZhongHeClientLockProxy.LABEL_THREAD_LOCAL.get()).await();
+                    SyncResultSupport.labelDownloadResultDataCountDown.get(label).await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

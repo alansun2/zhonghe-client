@@ -8,14 +8,16 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import lombok.extern.slf4j.Slf4j;
+import vip.tuoyang.base.util.ThreadUtils;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.config.ZhongHeSystemProperties;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.exception.TimeOutException;
 import vip.tuoyang.zhonghe.service.handler.MyChannelInitializer;
-import vip.tuoyang.zhonghe.support.ZhongHeCallback;
+import vip.tuoyang.zhonghe.support.CountDownLatch2;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
@@ -26,7 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author AlanSun
@@ -47,6 +48,8 @@ public class SendClient {
 
     private final ExecutorService executorService;
 
+    private final CountDownLatch2 countDownLatch2 = new CountDownLatch2(1);
+
     public SendClient(ZhongHeConfig zhongHeConfig, String label, ZhongHeCallback callback) {
         this.zhongHeConfig = zhongHeConfig;
         inetSocketAddress = new InetSocketAddress(zhongHeConfig.getMiddleWareIp(), zhongHeConfig.getMiddleWarePort());
@@ -55,7 +58,7 @@ public class SendClient {
         executorService = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(50), r -> {
             Thread thread = new Thread(r);
             thread.setName("zhonghe-client-channel-start_" + label);
-            thread.setDaemon(false);
+            thread.setDaemon(true);
             return thread;
         });
     }
@@ -73,10 +76,12 @@ public class SendClient {
                         .channel(NioDatagramChannel.class)
                         .handler(new MyChannelInitializer(label, callback, this));
                 channel = b.bind(zhongHeConfig.getLocalBindPort()).sync().channel();
+                countDownLatch2.countDown();
                 channel.closeFuture().await();
             } catch (Exception e) {
                 // Address already in use: bind
                 log.error("启动中河客户端失败", e);
+                countDownLatch2.countDown();
             } finally {
                 group.shutdownGracefully();
             }
@@ -88,12 +93,18 @@ public class SendClient {
      *
      * @return {@link Channel}
      */
-    private Channel getChannel() {
+    public Channel getChannel() {
         while (channel == null) {
             synchronized (atomicInteger) {
                 if (channel == null) {
                     this.startListener();
-                    LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
+                    try {
+                        countDownLatch2.await();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        countDownLatch2.reset();
+                    }
                 }
             }
         }
@@ -108,9 +119,15 @@ public class SendClient {
     }
 
     public void close() {
-        if (channel.isActive()) {
+        if (channel != null && channel.isActive()) {
             channel.close();
         }
+
+        if (group != null) {
+            group.shutdownGracefully();
+        }
+
+        ThreadUtils.shutdownAndAwaitTermination(executorService);
     }
 
     /**
@@ -154,7 +171,11 @@ public class SendClient {
             log.info("cmd: [{}], para: [{}], 发送: [{}]", cmdEnum, para, sb.toString());
             getChannel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Objects.requireNonNull(ConvertCode.hexString2Bytes(sb.toString()))), inetSocketAddress));
             try {
-                SyncResultSupport.labelResultCountDownMap.get(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
+                if (cmdEnum.equals(CmdEnum.CLOSE)) {
+                    SyncResultSupport.labelResultCountDownMap.get(label).await(3, TimeUnit.SECONDS);
+                } else {
+                    SyncResultSupport.labelResultCountDownMap.get(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
+                }
             } catch (InterruptedException e) {
                 log.error("终端异常", e);
             }

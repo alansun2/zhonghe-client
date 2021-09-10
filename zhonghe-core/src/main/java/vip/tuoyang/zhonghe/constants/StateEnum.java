@@ -13,6 +13,10 @@ public enum StateEnum {
      */
     ONLINE_RUNNING("01AA", ""),
     /**
+     * 变为01AA发送的一帧在线并且运行中
+     */
+    TO_ONLINE_RUNNING("03AA", ""),
+    /**
      * 服务挂了，中间件运行中
      */
     OFFLINE_RUNNING("00AA", "服务未启动"),

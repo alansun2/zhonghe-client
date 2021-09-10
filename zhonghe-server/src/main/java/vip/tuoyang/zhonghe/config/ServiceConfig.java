@@ -27,6 +27,7 @@ import vip.tuoyang.zhonghe.schedule.IpSchedule;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author AlanSun
@@ -67,7 +68,7 @@ public class ServiceConfig implements SchedulingConfigurer {
         if (zhongHeConfig.getNasIp() == null) {
             zhongHeConfig.setNasIp(publicIp);
         }
-        if (zhongHeConfig.getMiddleWareIp() != null) {
+        if (zhongHeConfig.getMiddleWareIp() == null) {
             zhongHeConfig.setMiddleWareIp(publicIp);
         }
         zhongHeConfig.setFileUploadUrl("http://" + zhongHeConfig.getMiddleWareIp() + ":" + environment.getProperty("server.port") + serviceSystemProperties.getFileUploadPath());
@@ -78,7 +79,7 @@ public class ServiceConfig implements SchedulingConfigurer {
         final HttpParams httpParams = HttpParams.builder()
                 .url(serviceSystemProperties.getServerUrl() + serviceSystemProperties.getPath().getServerInit())
                 .headers(basicHeaders)
-                .httpEntity(new StringEntity(JSON.toJSONString(zhongHeConfig), "utf-8")).build();
+                .httpEntity(new StringEntity(JSON.toJSONString(zhongHeConfig), StandardCharsets.UTF_8)).build();
         final HttpResponse httpResponse;
         try {
             httpResponse = HttpClientUtils.doPost(httpParams);

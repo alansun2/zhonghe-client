@@ -5,6 +5,7 @@ import vip.tuoyang.zhonghe.bean.ZhongHeDownloadResult;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.constants.DownloadTypeEnum;
+import vip.tuoyang.zhonghe.service.handler.MyClientHandler;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 
@@ -45,11 +46,11 @@ public class DownloadHandlerContext {
     public void handler(ZhongHeResponse zhongHeResponse) {
         if (zhongHeResponse.getContent().length() == 0) {
             SyncResultSupport.labelDownloadResultMap.put(zhongHeResponse.getPara(), new ZhongHeDownloadResult());
-            SyncResultSupport.labelDownloadResultDataCountDown.get(ZhongHeClientLockProxy.LABEL_THREAD_LOCAL.get()).countDown();
+            SyncResultSupport.labelDownloadResultDataCountDown.get(MyClientHandler.LABEL_THREAD_LOCAL.get()).countDown();
         } else {
             downLoadResultHandler.handler(zhongHeResponse.getPara(), zhongHeResponse.getContent());
             if (zhongHeResponse.isLastSn()) {
-                SyncResultSupport.labelDownloadResultDataCountDown.get(ZhongHeClientLockProxy.LABEL_THREAD_LOCAL.get()).countDown();
+                SyncResultSupport.labelDownloadResultDataCountDown.get(MyClientHandler.LABEL_THREAD_LOCAL.get()).countDown();
             } else {
                 ZhongHeClientLockProxy.ZHONG_HE_CLIENT_THREAD_LOCAL.get().sendAsync(CmdEnum.SEND_NEXT_DATA, "00", zhongHeResponse.getSn(), null);
             }

@@ -1,8 +1,8 @@
 package vip.tuoyang.zhonghe.service;
 
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
-import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
+import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.support.ZhongHeClientLockProxy;
 
 import java.util.Map;
@@ -39,6 +39,7 @@ public class ZhongHeConnectionManager {
         final ZhongHeClient zhongHeClient = labelClientMap.get(label);
         if (zhongHeClient != null) {
             zhongHeClient.close(true);
+            labelClientMap.remove(label);
         }
         labelClientMap.put(label, ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig, label, stateCallback), label));
     }
