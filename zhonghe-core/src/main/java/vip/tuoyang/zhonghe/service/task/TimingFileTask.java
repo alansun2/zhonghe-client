@@ -30,8 +30,8 @@ public class TimingFileTask implements TaskGenerator {
                 id + request.getTaskType() + "00" +
                 // timeType timeMode
                 request.getTime() +
-                request.getStartTime() +
-                request.getEndTime() +
+                request.getStartTimeHex() +
+                request.getEndTimeHex() +
                 request.getWeek() +
                 request.getPlayWay() +
                 request.getPlayContentLen() +
