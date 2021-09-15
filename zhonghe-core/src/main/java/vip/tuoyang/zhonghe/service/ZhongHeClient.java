@@ -62,7 +62,7 @@ public interface ZhongHeClient {
      * @param request {@link TaskRequest}
      * @return {@link ZhongHeResult}
      */
-    ZhongHeResult<?> editTimingTask(String id, TaskRequest request);
+    ZhongHeResult<String> editTimingTask(String id, TaskRequest request);
 
     /**
      * 删除定时任务

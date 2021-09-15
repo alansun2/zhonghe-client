@@ -1,5 +1,6 @@
 package vip.tuoyang.zhonghe.bean.request;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,11 +39,13 @@ public class TaskRequest {
      * 开始时间
      */
     @Setter
+    @Getter
     private LocalDateTime startTime;
     /**
      * 结束时间
      */
     @Setter
+    @Getter
     private LocalDateTime endTime;
     /**
      * 星期选项 1,2,3,4,5,6,7

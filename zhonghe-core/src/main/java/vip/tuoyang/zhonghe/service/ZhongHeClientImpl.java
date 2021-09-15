@@ -192,7 +192,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * @param request {@link TaskRequest}
      */
     @Override
-    public ZhongHeResult<?> editTimingTask(String id, TaskRequest request) {
+    public ZhongHeResult<String> editTimingTask(String id, TaskRequest request) {
         final String generator = TimingFileTask.getInstance().generator(id, request);
         return sendClient.send(CmdEnum.PRO_TIMING_TASK, "02", generator).toZhongHeResult();
     }

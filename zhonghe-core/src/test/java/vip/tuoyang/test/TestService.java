@@ -32,7 +32,7 @@ public class TestService {
     @BeforeAll
     public static void before() throws InterruptedException {
         ZhongHeConfig zhongHeConfig = new ZhongHeConfig();
-        String localIp = "192.168.166.153";
+        String localIp = "192.168.31.252";
         zhongHeConfig.setLocalBindPort(7000);
         zhongHeConfig.setDeviceDes("Alan本地");
         zhongHeConfig.setDeviceId("00001011");
@@ -187,7 +187,7 @@ public class TestService {
 
     @Test
     public void abortTask() {
-        final ZhongHeResult<?> zhongHeResult = zhongHeClient.abortTaskBySubId("D8E3F001");
+        final ZhongHeResult<?> zhongHeResult = zhongHeClient.abortTaskBySubId("03");
     }
 
     @Test
