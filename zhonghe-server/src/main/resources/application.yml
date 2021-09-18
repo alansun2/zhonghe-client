@@ -14,9 +14,6 @@ spring:
     multipart:
       max-file-size: 10MB
 
-  config:
-    location:
-
 system:
   ip-report-switch: false
   server-url: 'http://localhost:28083'
