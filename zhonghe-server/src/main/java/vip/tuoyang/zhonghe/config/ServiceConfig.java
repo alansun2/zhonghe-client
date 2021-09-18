@@ -107,7 +107,17 @@ public class ServiceConfig implements SchedulingConfigurer {
     }
 
     private void initInstallPath() throws IOException {
-        String installInfoPath = ServiceConfig.class.getResource("/").getPath() + "/install-info.txt";
+        String installDir;
+        String installInfoPath;
+        final String activeProfile = environment.getActiveProfiles()[0];
+        final String path = ServiceConfig.class.getResource("/").getPath();
+        if ("pro".equals(activeProfile)) {
+            installInfoPath = path.substring(0, path.indexOf("zhonghe-broadcast") + 17);
+            installDir = installInfoPath + "/install-info.txt";
+        } else {
+            installInfoPath = path + "/install-info.txt";
+            installDir = serviceSystemProperties.getInstallDir();
+        }
         BroadcastInstallPath broadcastInstallPath = null;
         try {
             broadcastInstallPath = JSON.parseObject(org.apache.commons.io.FileUtils.readFileToString(new File(installInfoPath), "UTF-8"), BroadcastInstallPath.class);
@@ -121,11 +131,6 @@ public class ServiceConfig implements SchedulingConfigurer {
             return;
         }
 
-        final String activeProfile = environment.getActiveProfiles()[0];
-        String installDir = serviceSystemProperties.getInstallDir();
-        if ("pro".equals(activeProfile)) {
-            installDir = installInfoPath.substring(0, installInfoPath.indexOf("zhonghe-broadcast") + 17);
-        }
         String middleWarePath;
         String nasPath;
         List<File> files = new ArrayList<>();
