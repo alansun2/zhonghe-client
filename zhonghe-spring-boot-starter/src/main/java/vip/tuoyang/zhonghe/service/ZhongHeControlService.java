@@ -42,7 +42,7 @@ public class ZhongHeControlService {
         List<Header> headers = new ArrayList<>();
         headers.add(new BasicHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
         headers.add(new BasicHeader("secret", serviceSystemProperties.getSecret()));
-        final HttpParams httpParams = HttpParams.builder().url(zhongHeClient.getZhongHeConfig().getNasIp() + "/common/reboot").headers(headers).build();
+        final HttpParams httpParams = HttpParams.builder().url("http://" + zhongHeClient.getZhongHeConfig().getNasIp() + ":8084" + "/common/reboot").headers(headers).build();
         try {
             final HttpResponse httpResponse = HttpClientUtils.doPost(httpParams);
             final StatusLine statusLine = httpResponse.getStatusLine();
@@ -50,7 +50,6 @@ public class ZhongHeControlService {
                 return true;
             } else {
                 log.error("重启失败: label: [{}], httpResponse: [{}]", label, EntityUtils.toString(httpResponse.getEntity(), Charset.defaultCharset()));
-
                 return false;
             }
         } catch (IOException e) {

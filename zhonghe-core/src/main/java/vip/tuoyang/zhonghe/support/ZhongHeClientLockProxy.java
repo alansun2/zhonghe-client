@@ -36,7 +36,7 @@ public class ZhongHeClientLockProxy implements InvocationHandler {
         ZHONG_HE_CLIENT_THREAD_LOCAL.set(proxyed.getSendClient());
         reentrantLock.lock();
         try {
-            if (!"state".equals(method.getName()) && !"close".equals(method.getName())) {
+            if (!"initMiddleWare".equals(method.getName()) && !"state".equals(method.getName()) && !"close".equals(method.getName())) {
                 final ZhongHeResult<StateResponse> state = proxyed.state();
                 if (!state.getData().getState().equals(StateEnum.ONLINE_RUNNING)) {
                     throw new BizException(state.getData().getState().getDesc());

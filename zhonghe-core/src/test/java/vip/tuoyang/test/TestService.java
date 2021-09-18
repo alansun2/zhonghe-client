@@ -56,7 +56,7 @@ public class TestService {
 
     @Test
     public void init() {
-        zhongHeClient.initMiddleWare();
+        zhongHeClient.initMiddleWare(true);
     }
 
     @Test

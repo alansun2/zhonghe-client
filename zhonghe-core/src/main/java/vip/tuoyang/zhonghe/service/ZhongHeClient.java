@@ -32,7 +32,7 @@ public interface ZhongHeClient {
      *
      * @return {@link ZhongHeResult}
      */
-    ZhongHeResult<?> initMiddleWare();
+    ZhongHeResult<?> initMiddleWare(boolean needClose);
 
     /**
      * 关闭

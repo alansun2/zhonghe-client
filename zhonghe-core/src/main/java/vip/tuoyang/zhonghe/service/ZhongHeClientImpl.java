@@ -89,9 +89,11 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      * 初始化中间件
      */
     @Override
-    public ZhongHeResult<?> initMiddleWare() {
+    public ZhongHeResult<?> initMiddleWare(boolean needClose) {
         // 先关闭
-        this.close(false);
+        if (needClose) {
+            this.close(false);
+        }
 
         //// 构建初始化数据
         StringBuilder sb = new StringBuilder();
@@ -158,7 +160,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
                 if (e instanceof TimeOutException) {
                     if (retryCount == 2) {
                         LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
-                        this.initMiddleWare();
+                        this.initMiddleWare(true);
                     }
                 } else {
                     throw e;
@@ -172,7 +174,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
         }
 
         if (zhongHeResult.getData().getState().equals(StateEnum.OFFLINE_DOWN)) {
-            this.initMiddleWare();
+            this.initMiddleWare(true);
             LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(1));
             zhongHeResult = this.state();
         }

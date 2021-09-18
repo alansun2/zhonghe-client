@@ -26,7 +26,6 @@ import vip.tuoyang.base.util.bean.HttpParams;
 import vip.tuoyang.zhonghe.bean.request.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 import vip.tuoyang.zhonghe.schedule.IpSchedule;
-import vip.tuoyang.zhonghe.service.CommonService;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -108,12 +107,12 @@ public class ServiceConfig implements SchedulingConfigurer {
     }
 
     private void initInstallPath() throws IOException {
-        String path2 = ServiceConfig.class.getResource("/").getPath();
+        String installInfoPath = ServiceConfig.class.getResource("/").getPath() + "/install-info.txt";
         BroadcastInstallPath broadcastInstallPath = null;
         try {
-            broadcastInstallPath = JSON.parseObject(org.apache.commons.io.FileUtils.readFileToString(new File(path2), "UTF-8"), BroadcastInstallPath.class);
+            broadcastInstallPath = JSON.parseObject(org.apache.commons.io.FileUtils.readFileToString(new File(installInfoPath), "UTF-8"), BroadcastInstallPath.class);
         } catch (Exception e) {
-            if (!e.getMessage().contains("NOT FOUND")) {
+            if (!e.getMessage().contains("does not exist")) {
                 throw e;
             }
         }
@@ -122,21 +121,22 @@ public class ServiceConfig implements SchedulingConfigurer {
             return;
         }
 
+        final String activeProfile = environment.getActiveProfiles()[0];
         String installDir = serviceSystemProperties.getInstallDir();
-        if (org.apache.commons.lang3.StringUtils.isNotEmpty(installDir)) {
-            installDir = CommonService.class.getResource("").getPath().substring(0, 3);
+        if ("pro".equals(activeProfile)) {
+            installDir = installInfoPath.substring(0, installInfoPath.indexOf("zhonghe-broadcast") + 17);
         }
         String middleWarePath;
         String nasPath;
         List<File> files = new ArrayList<>();
-        vip.tuoyang.base.util.FileUtils.searchFile(files, new File(installDir), 2, file -> {
+        vip.tuoyang.base.util.FileUtils.searchFile(files, new File(installDir), 1, file -> {
             final String name = file.getName().toLowerCase();
             return name.startsWith("MiddleWare".toLowerCase()) && name.endsWith(".exe");
         });
         AssertUtils.notEmpty(files, "未找到中间件安装地址");
         middleWarePath = files.get(0).getAbsolutePath();
         files.clear();
-        vip.tuoyang.base.util.FileUtils.searchFile(files, new File(installDir), 2, file -> {
+        vip.tuoyang.base.util.FileUtils.searchFile(files, new File(installDir), 1, file -> {
             final String name = file.getName().toLowerCase();
             return name.startsWith("服务器软件".toLowerCase()) && name.endsWith(".exe");
         });
@@ -146,6 +146,6 @@ public class ServiceConfig implements SchedulingConfigurer {
         broadcastInstallPath = new BroadcastInstallPath();
         broadcastInstallPath.setMiddleWarePath(middleWarePath);
         broadcastInstallPath.setNasPath(nasPath);
-        org.apache.commons.io.FileUtils.writeStringToFile(new File(path2), JSON.toJSONString(broadcastInstallPath));
+        org.apache.commons.io.FileUtils.writeStringToFile(new File(installInfoPath), JSON.toJSONString(broadcastInstallPath));
     }
 }

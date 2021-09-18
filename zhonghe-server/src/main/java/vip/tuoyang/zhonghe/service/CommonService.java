@@ -45,7 +45,7 @@ public class CommonService {
         final BroadcastInstallPath broadcastInstallPath = serviceSystemProperties.getBroadcastInstallPath();
         final Runtime runtime = Runtime.getRuntime();
         this.rebootInternal(runtime, 8607, broadcastInstallPath.getMiddleWarePath());
-        this.rebootInternal(runtime, 8100, broadcastInstallPath.getNasPath());
+        this.rebootInternal(runtime, 8200, broadcastInstallPath.getNasPath());
     }
 
     private void rebootInternal(Runtime runtime, int port, String processPath) throws IOException {
