@@ -46,11 +46,11 @@ public class DownloadHandlerContext {
     public void handler(ZhongHeResponse zhongHeResponse) {
         if (zhongHeResponse.getContent().length() == 0) {
             SyncResultSupport.labelDownloadResultMap.put(zhongHeResponse.getPara(), new ZhongHeDownloadResult());
-            SyncResultSupport.labelDownloadResultDataCountDown.get(MyClientHandler.LABEL_THREAD_LOCAL.get()).countDown();
+            SyncResultSupport.getLabelDownloadResultDataCount(MyClientHandler.LABEL_THREAD_LOCAL.get()).countDown();
         } else {
             downLoadResultHandler.handler(zhongHeResponse.getPara(), zhongHeResponse.getContent());
             if (zhongHeResponse.isLastSn()) {
-                SyncResultSupport.labelDownloadResultDataCountDown.get(MyClientHandler.LABEL_THREAD_LOCAL.get()).countDown();
+                SyncResultSupport.getLabelDownloadResultDataCount(MyClientHandler.LABEL_THREAD_LOCAL.get()).countDown();
             } else {
                 ZhongHeClientLockProxy.ZHONG_HE_CLIENT_THREAD_LOCAL.get().sendAsync(CmdEnum.SEND_NEXT_DATA, "00", zhongHeResponse.getSn(), null);
             }

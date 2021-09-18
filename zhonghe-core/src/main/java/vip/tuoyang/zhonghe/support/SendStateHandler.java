@@ -17,12 +17,12 @@ public class SendStateHandler {
             final CmdEnum cmdEnum = resultInternal.getZhongHeResponse().getCmdEnum();
             if (cmdEnum == CmdEnum.PRO_TIMING_TASK) {
                 resultInternal.setData(zhongHeResponse.getContent().substring(8, 10));
-                SyncResultSupport.labelResultCountDownMap.get(label).countDown();
+                SyncResultSupport.getLabelResultCountDown(label).countDown();
             } else if (cmdEnum == CmdEnum.UPLOAD_MEDIA_FILE) {
                 final boolean mediaFileUploadComplete = this.isMediaFileUploadComplete();
                 if (mediaFileUploadComplete) {
                     resultInternal.setData(this.getMediaFileNo());
-                    SyncResultSupport.labelResultCountDownMap.get(label).countDown();
+                    SyncResultSupport.getLabelResultCountDown(label).countDown();
                 }
             }
         }

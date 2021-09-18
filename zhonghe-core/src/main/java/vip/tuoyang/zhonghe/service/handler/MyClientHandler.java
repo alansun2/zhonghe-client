@@ -68,7 +68,7 @@ public class MyClientHandler extends SimpleChannelInboundHandler<DatagramPacket>
                 final CmdEnum cmdEnum = zhongHeResponse1.getCmdEnum();
                 final String para = zhongHeResponse1.getPara();
                 if ((cmdEnum != CmdEnum.PRO_TIMING_TASK && "01".equals(para)) && cmdEnum != CmdEnum.UPLOAD_MEDIA_FILE && cmdEnum != CmdEnum.SEND_STATE) {
-                    SyncResultSupport.labelResultCountDownMap.get(label).countDown();
+                    SyncResultSupport.getLabelResultCountDown(label).countDown();
                 }
             }
         } finally {

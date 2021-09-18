@@ -30,6 +30,7 @@ import vip.tuoyang.zhonghe.schedule.IpSchedule;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,12 +113,15 @@ public class ServiceConfig implements SchedulingConfigurer {
         final String activeProfile = environment.getActiveProfiles()[0];
         final String path = ServiceConfig.class.getResource("/").getPath();
         if ("pro".equals(activeProfile)) {
-            installInfoPath = path.substring(0, path.indexOf("zhonghe-broadcast") + 17);
-            installDir = installInfoPath + "/install-info.txt";
+            installDir = path.substring(6, path.indexOf("zhonghe-broadcast") + 17);
+            installInfoPath = installDir + "/install-info.txt";
         } else {
-            installInfoPath = path + "/install-info.txt";
             installDir = serviceSystemProperties.getInstallDir();
+            installInfoPath = path + "/install-info.txt";
         }
+        log.info("installDir : [{}], installInfoPath: [{}]", installDir, installInfoPath);
+        log.info("charset : [{}]", Charset.defaultCharset());
+
         BroadcastInstallPath broadcastInstallPath = null;
         try {
             broadcastInstallPath = JSON.parseObject(org.apache.commons.io.FileUtils.readFileToString(new File(installInfoPath), "UTF-8"), BroadcastInstallPath.class);

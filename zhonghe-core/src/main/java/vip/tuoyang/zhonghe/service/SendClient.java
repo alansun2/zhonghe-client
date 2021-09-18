@@ -146,7 +146,7 @@ public class SendClient {
      */
     public ResultInternal send(CmdEnum cmdEnum, String para, String content) {
         try {
-            SyncResultSupport.labelResultCountDownMap.get(label).reset();
+            SyncResultSupport.getLabelResultCountDown(label).reset();
             StringBuilder sb = new StringBuilder();
             // 0 1 2 固定
             sb.append("FEE0A7");
@@ -179,9 +179,9 @@ public class SendClient {
             getChannel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Objects.requireNonNull(ConvertCode.hexString2Bytes(sb.toString()))), inetSocketAddress));
             try {
                 if (cmdEnum.equals(CmdEnum.CLOSE) || cmdEnum.equals(CmdEnum.STATE)) {
-                    SyncResultSupport.labelResultCountDownMap.get(label).await(3, TimeUnit.SECONDS);
+                    SyncResultSupport.getLabelResultCountDown(label).await(3, TimeUnit.SECONDS);
                 } else {
-                    SyncResultSupport.labelResultCountDownMap.get(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
+                    SyncResultSupport.getLabelResultCountDown(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
                 }
             } catch (InterruptedException e) {
                 log.error("终端异常", e);

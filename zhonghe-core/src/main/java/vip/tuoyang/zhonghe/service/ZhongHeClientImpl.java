@@ -351,11 +351,11 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     private <T> ZhongHeResult<List<T>> getDownloadData(String para) {
         ZhongHeResult<List<T>> zhongHeResult = new ZhongHeResult<>();
         try {
-            SyncResultSupport.labelDownloadResultDataCountDown.get(label).reset();
+            SyncResultSupport.getLabelDownloadResultDataCount(label).reset();
             final ResultInternal resultInternal = sendClient.send(CmdEnum.DOWNLOAD_DATA, para, null);
             if (resultInternal.isSuccess()) {
                 try {
-                    SyncResultSupport.labelDownloadResultDataCountDown.get(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
+                    SyncResultSupport.getLabelDownloadResultDataCount(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
