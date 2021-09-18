@@ -21,5 +21,5 @@ public class ServiceSystemProperties {
     /**
      * 超时时间
      */
-    public int timeout = 5;
+    private int timeout = 5;
 }

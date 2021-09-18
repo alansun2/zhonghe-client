@@ -9,6 +9,7 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import vip.tuoyang.base.exception.BizException;
+import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.base.util.HttpClientUtils;
 import vip.tuoyang.base.util.bean.HttpParams;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -68,6 +70,11 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public SendClient getSendClient() {
         return sendClient;
+    }
+
+    @Override
+    public ZhongHeConfig getZhongHeConfig() {
+        return zhongHeConfig;
     }
 
     /**
@@ -181,6 +188,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<String> addTimingTask(TaskRequest request) {
+        request.valid();
         final String generator = TimingFileTask.getInstance().generator("FE", request);
         return sendClient.send(CmdEnum.PRO_TIMING_TASK, "01", generator.toUpperCase()).toZhongHeResult();
     }
@@ -193,6 +201,8 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<String> editTimingTask(String id, TaskRequest request) {
+        request.valid();
+        AssertUtils.notBlank(id, "id null error");
         final String generator = TimingFileTask.getInstance().generator(id, request);
         return sendClient.send(CmdEnum.PRO_TIMING_TASK, "02", generator).toZhongHeResult();
     }
@@ -204,6 +214,8 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<?> deleteTimingTask(String id, TaskRequest request) {
+        request.valid();
+        AssertUtils.notBlank(id, "id null error");
         final String generator = TimingFileTask.getInstance().generator(id, request);
         return sendClient.send(CmdEnum.PRO_TIMING_TASK, "03", generator).toZhongHeResult();
     }
@@ -216,6 +228,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<String> addEditableTask(TaskRequest request) {
+        request.valid();
         final String generator = EditableTask.getInstance().generator("00", request);
         return sendClient.send(CmdEnum.REQUEST_EDITABLE_TASK, "00", generator.toUpperCase()).toZhongHeResult();
     }
@@ -227,6 +240,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<?> abortTaskBySubId(String id) {
+        AssertUtils.notBlank(id, "id null error");
         return sendClient.send(CmdEnum.ABORT_TASK_BY_SUB_ID, "00", ServiceUtils.changeOrder(id, 2)).toZhongHeResult();
     }
 
@@ -241,14 +255,15 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName) {
+        AssertUtils.notNull(inputStream, "inputStream null error");
+        AssertUtils.notBlank(fileName, "fileName null error");
+
         ZhongHeResult<String> zhongHeResult = new ZhongHeResult<>();
         HttpResponse httpResponse;
         try {
-            BasicHeader[] basicHeaders = new BasicHeader[1];
-            basicHeaders[0] = new BasicHeader("secret", ZhongHeSystemProperties.secret);
             String uploadUrl = zhongHeConfig.getFileUploadUrl() + "?fileName=" + URLEncoder.encode(fileName, Charset.defaultCharset().toString());
             final InputStreamEntity inputStreamEntity = new InputStreamEntity(inputStream);
-            final HttpParams httpParams = HttpParams.builder().url(uploadUrl).httpEntity(inputStreamEntity).headers(basicHeaders).build();
+            final HttpParams httpParams = HttpParams.builder().url(uploadUrl).httpEntity(inputStreamEntity).headers(Collections.singletonList(new BasicHeader("secret", ZhongHeSystemProperties.secret))).build();
             httpResponse = HttpClientUtils.doPost(httpParams);
         } catch (IOException e) {
             log.error("上传文件失败, 请求失败", e);
@@ -338,7 +353,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
             final ResultInternal resultInternal = sendClient.send(CmdEnum.DOWNLOAD_DATA, para, null);
             if (resultInternal.isSuccess()) {
                 try {
-                    SyncResultSupport.labelDownloadResultDataCountDown.get(label).await();
+                    SyncResultSupport.labelDownloadResultDataCountDown.get(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -42,6 +42,8 @@ public enum StateEnum {
                 return OFFLINE_DOWN;
             case "00AA":
                 return OFFLINE_RUNNING;
+            case "03AA":
+                return TO_ONLINE_RUNNING;
             case "01AA":
                 return ONLINE_RUNNING;
             default:

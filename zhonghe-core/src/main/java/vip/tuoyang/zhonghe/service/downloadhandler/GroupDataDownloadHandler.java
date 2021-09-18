@@ -35,7 +35,11 @@ public class GroupDataDownloadHandler implements DownLoadResultHandler {
             GroupDataResponse groupDataResponse = new GroupDataResponse();
             groupDataResponse.setNo(ServiceUtils.changeOrder(contentStr.substring(0, 8), 2));
             final int len = Integer.parseInt(contentStr.substring(8, 10), 16);
-            groupDataResponse.setGroupName(ServiceUtils.getContentFromHex(contentStr.substring(10, 10 + len * 2)));
+            if (len != 0) {
+                groupDataResponse.setGroupName(ServiceUtils.getContentFromHex(contentStr.substring(10, 10 + len * 2)));
+            } else {
+                groupDataResponse.setGroupName("未命名");
+            }
 
             List<String> terminalNos = new ArrayList<>();
             final String nosStr = contentStr.substring(36 * 2);

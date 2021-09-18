@@ -2,7 +2,6 @@ package vip.tuoyang.zhonghe.schedule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.entity.ContentType;
@@ -16,6 +15,8 @@ import vip.tuoyang.base.util.IpUtils;
 import vip.tuoyang.base.util.bean.HttpParams;
 import vip.tuoyang.zhonghe.bean.request.IpChangeRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
+
+import java.util.Collections;
 
 /**
  * @author AlanSun
@@ -42,9 +43,10 @@ public class IpSchedule {
             ipChangeRequest.setIp(publicIp);
             ipChangeRequest.setLabel(zhongHeConfig.getLabel());
             try {
-                final HttpParams.HttpParamsBuilder builder = HttpParams.builder().headers(ArrayUtils.toArray(new BasicHeader("secret", serviceSystemProperties.getSecret())))
+                final HttpParams.HttpParamsBuilder builder = HttpParams.builder().headers(Collections.singletonList(new BasicHeader("secret", serviceSystemProperties.getSecret())))
                         .url(serviceSystemProperties.getServerUrl() + serviceSystemProperties.getPath().getIpChange())
                         .httpEntity(new StringEntity(objectMapper.writeValueAsString(ipChangeRequest), ContentType.APPLICATION_JSON));
+
                 final HttpResponse httpResponse = HttpClientUtils.doPost(builder.build());
                 final StatusLine statusLine = httpResponse.getStatusLine();
                 if (statusLine.getStatusCode() == HttpStatus.OK.value()) {

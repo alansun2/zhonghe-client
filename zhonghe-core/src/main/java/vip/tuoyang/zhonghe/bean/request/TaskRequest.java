@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
  * @author AlanSun
  * @date 2021/8/26 14:30
  */
+@Setter
+@Getter
 public class TaskRequest {
     /**
      * 任务名称
@@ -139,7 +141,7 @@ public class TaskRequest {
     /**
      * 获取任务类型
      */
-    public String getTaskType() {
+    public String getTaskTypeHex() {
         return StringUtils.leftPad(taskType.toString(), 2, '0');
     }
 
@@ -150,7 +152,7 @@ public class TaskRequest {
                 StringUtils.leftPad(Integer.toBinaryString(timeType), 2, '0'), 2)), 2, '0');
     }
 
-    public String getTaskName() {
+    public String getTaskNameHex() {
         final String s = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(taskName));
         final String len = ConvertCode.intToHexString(s.length() / 2, 1);
         return StringUtils.rightPad(len + s, 64, '0');
@@ -170,12 +172,12 @@ public class TaskRequest {
         return ServiceUtils.localDateTimeToHex(endTime);
     }
 
-    public String getPlayWay() {
+    public String getPlayWayHex() {
         return ConvertCode.binStr2HexString(ConvertCode.int2BinString(count, 5) + ConvertCode.int2BinString(playMode, 3), 1);
     }
 
 
-    public String getWeek() {
+    public String getWeekHex() {
         if (StringUtils.isEmpty(weekOption)) {
             return "00";
         }
@@ -195,11 +197,11 @@ public class TaskRequest {
         return ConvertCode.binStr2HexString(sb.append("0").toString(), 1);
     }
 
-    public String getVolume() {
+    public String getVolumeHex() {
         return ConvertCode.intToHexString(volume, 1);
     }
 
-    public String getOpenInAdvanceTime() {
+    public String getOpenInAdvanceTimeHex() {
         return ConvertCode.intToHexString(isOpenPowerAmplifierInAdvanceTime, 1);
     }
 

@@ -2,6 +2,7 @@ package vip.tuoyang.zhonghe.config;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.StringEntity;
@@ -22,12 +23,17 @@ import vip.tuoyang.base.util.HttpClientUtils;
 import vip.tuoyang.base.util.IpUtils;
 import vip.tuoyang.base.util.StringUtils;
 import vip.tuoyang.base.util.bean.HttpParams;
+import vip.tuoyang.zhonghe.bean.request.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 import vip.tuoyang.zhonghe.schedule.IpSchedule;
+import vip.tuoyang.zhonghe.service.CommonService;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author AlanSun
@@ -59,6 +65,10 @@ public class ServiceConfig implements SchedulingConfigurer {
 
     @PostConstruct
     public void init() throws IOException {
+        // 初始化安装路径
+        this.initInstallPath();
+
+        // 上报初始化数据
         final ServiceSystemProperties.ZhongHeConfig zhongHeConfig = serviceSystemProperties.getZhongHeConfig();
         zhongHeConfig.valid();
 
@@ -73,12 +83,12 @@ public class ServiceConfig implements SchedulingConfigurer {
         }
         zhongHeConfig.setFileUploadUrl("http://" + zhongHeConfig.getMiddleWareIp() + ":" + environment.getProperty("server.port") + serviceSystemProperties.getFileUploadPath());
 
-        BasicHeader[] basicHeaders = new BasicHeader[2];
-        basicHeaders[0] = new BasicHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        basicHeaders[1] = new BasicHeader("secret", serviceSystemProperties.getSecret());
+        List<Header> headers = new ArrayList<>();
+        headers.add(new BasicHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
+        headers.add(new BasicHeader("secret", serviceSystemProperties.getSecret()));
         final HttpParams httpParams = HttpParams.builder()
                 .url(serviceSystemProperties.getServerUrl() + serviceSystemProperties.getPath().getServerInit())
-                .headers(basicHeaders)
+                .headers(headers)
                 .httpEntity(new StringEntity(JSON.toJSONString(zhongHeConfig), StandardCharsets.UTF_8)).build();
         final HttpResponse httpResponse;
         try {
@@ -95,5 +105,47 @@ public class ServiceConfig implements SchedulingConfigurer {
                 throw new BizException("启动失败，errorMsg: " + res);
             }
         }
+    }
+
+    private void initInstallPath() throws IOException {
+        String path2 = ServiceConfig.class.getResource("/").getPath();
+        BroadcastInstallPath broadcastInstallPath = null;
+        try {
+            broadcastInstallPath = JSON.parseObject(org.apache.commons.io.FileUtils.readFileToString(new File(path2), "UTF-8"), BroadcastInstallPath.class);
+        } catch (Exception e) {
+            if (!e.getMessage().contains("NOT FOUND")) {
+                throw e;
+            }
+        }
+        if (broadcastInstallPath != null) {
+            serviceSystemProperties.setBroadcastInstallPath(broadcastInstallPath);
+            return;
+        }
+
+        String installDir = serviceSystemProperties.getInstallDir();
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(installDir)) {
+            installDir = CommonService.class.getResource("").getPath().substring(0, 3);
+        }
+        String middleWarePath;
+        String nasPath;
+        List<File> files = new ArrayList<>();
+        vip.tuoyang.base.util.FileUtils.searchFile(files, new File(installDir), 2, file -> {
+            final String name = file.getName().toLowerCase();
+            return name.startsWith("MiddleWare".toLowerCase()) && name.endsWith(".exe");
+        });
+        AssertUtils.notEmpty(files, "未找到中间件安装地址");
+        middleWarePath = files.get(0).getAbsolutePath();
+        files.clear();
+        vip.tuoyang.base.util.FileUtils.searchFile(files, new File(installDir), 2, file -> {
+            final String name = file.getName().toLowerCase();
+            return name.startsWith("服务器软件".toLowerCase()) && name.endsWith(".exe");
+        });
+        AssertUtils.notEmpty(files, "未找到 nas 安装地址");
+        nasPath = files.get(0).getAbsolutePath();
+
+        broadcastInstallPath = new BroadcastInstallPath();
+        broadcastInstallPath.setMiddleWarePath(middleWarePath);
+        broadcastInstallPath.setNasPath(nasPath);
+        org.apache.commons.io.FileUtils.writeStringToFile(new File(path2), JSON.toJSONString(broadcastInstallPath));
     }
 }

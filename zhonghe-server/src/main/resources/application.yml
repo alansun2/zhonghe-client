@@ -14,6 +14,9 @@ spring:
     multipart:
       max-file-size: 10MB
 
+  config:
+    location:
+
 system:
   ip-report-switch: false
   server-url: 'http://localhost:28083'
@@ -23,5 +26,5 @@ system:
     device-des: 'Alan测试'
     device-address: '设备测试学校'
     manager-code: '12345668'
-    nas-ip: '192.168.166.153'
-    middle-ware-ip: '192.168.166.153'
+    nas-ip: '192.168.166.152'
+    middle-ware-ip: '192.168.166.152'

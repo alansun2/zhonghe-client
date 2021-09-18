@@ -178,7 +178,7 @@ public class SendClient {
             log.info("cmd: [{}], para: [{}], 发送: [{}]", cmdEnum, para, sb.toString());
             getChannel().writeAndFlush(new DatagramPacket(Unpooled.copiedBuffer(Objects.requireNonNull(ConvertCode.hexString2Bytes(sb.toString()))), inetSocketAddress));
             try {
-                if (cmdEnum.equals(CmdEnum.CLOSE)) {
+                if (cmdEnum.equals(CmdEnum.CLOSE) || cmdEnum.equals(CmdEnum.STATE)) {
                     SyncResultSupport.labelResultCountDownMap.get(label).await(3, TimeUnit.SECONDS);
                 } else {
                     SyncResultSupport.labelResultCountDownMap.get(label).await(ZhongHeSystemProperties.timeout, TimeUnit.SECONDS);
@@ -188,7 +188,7 @@ public class SendClient {
             }
             ResultInternal resultInternal = SyncResultSupport.labelResultInternal.get(label);
             if (resultInternal == null) {
-                log.info("cmd: [{}], para: [{}], 收到: [{}]", cmdEnum, para, "10秒超时");
+                log.info("cmd: [{}], para: [{}], 超时", cmdEnum, para);
                 throw new TimeOutException();
             }
 

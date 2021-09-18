@@ -34,9 +34,14 @@ public class MediaFileDataDownloadHandler implements DownLoadResultHandler {
         final List<MediaFileDataResponse> mediaFileDataResponses = contents.stream().map(s -> {
             MediaFileDataResponse mediaFileDataResponse = new MediaFileDataResponse();
             mediaFileDataResponse.setNo(ServiceUtils.changeOrder(s.substring(0, 4), 2));
-            int startIndex = 10;
-            int endIndex = Integer.parseInt(s.substring(8, 10), 16) * 2;
-            mediaFileDataResponse.setMediaFileName(ServiceUtils.getContentFromHex(s.substring(startIndex, startIndex + endIndex)));
+            final int length = Integer.parseInt(s.substring(8, 10), 16);
+            if (length != 0) {
+                int startIndex = 10;
+                int endIndex = length * 2 + startIndex;
+                mediaFileDataResponse.setMediaFileName(ServiceUtils.getContentFromHex(s.substring(startIndex, endIndex)));
+            } else {
+                mediaFileDataResponse.setMediaFileName("未命名");
+            }
             return mediaFileDataResponse;
         }).collect(Collectors.toList());
 

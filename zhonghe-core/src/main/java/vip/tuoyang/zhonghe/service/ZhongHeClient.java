@@ -6,6 +6,7 @@ import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
 import vip.tuoyang.zhonghe.bean.response.StateResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
+import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 
 import java.io.InputStream;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.List;
  */
 public interface ZhongHeClient {
     SendClient getSendClient();
+
+    ZhongHeConfig getZhongHeConfig();
 
     /**
      * test

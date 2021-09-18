@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.base.util.CheckUtils;
+import vip.tuoyang.zhonghe.bean.request.BroadcastInstallPath;
 
 /**
  * @author AlanSun
@@ -44,6 +45,13 @@ public class ServiceSystemProperties {
      * 配置
      */
     private ZhongHeConfig zhongHeConfig = new ZhongHeConfig();
+
+    /**
+     * 广播 nas 和中间件的安装目录
+     */
+    private String installDir;
+
+    private BroadcastInstallPath broadcastInstallPath;
 
     @Getter
     @Setter

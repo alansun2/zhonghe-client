@@ -49,7 +49,6 @@ public class MyClientHandler extends SimpleChannelInboundHandler<DatagramPacket>
 
         try {
             if (zhongHeResponse.getCmdEnum() != CmdEnum.SEND_STATE) {
-                SyncResultSupport.labelCmdMap.put(label, zhongHeResponse.getCmdEnum());
                 final ResultInternal resultInternal = resultHandlerContext.handle(zhongHeResponse);
                 resultInternal.setZhongHeResponse(zhongHeResponse);
                 SyncResultSupport.labelResultInternal.put(label, resultInternal);
@@ -63,14 +62,18 @@ public class MyClientHandler extends SimpleChannelInboundHandler<DatagramPacket>
             }
 
             // 需要等待获取数据的情况
-            final CmdEnum cmdEnum = SyncResultSupport.labelCmdMap.get(label);
-            if (cmdEnum != CmdEnum.PRO_TIMING_TASK && cmdEnum != CmdEnum.UPLOAD_MEDIA_FILE && cmdEnum != CmdEnum.SEND_STATE) {
-                SyncResultSupport.labelResultCountDownMap.get(label).countDown();
+            final ResultInternal resultInternal = SyncResultSupport.labelResultInternal.get(label);
+            if (resultInternal != null) {
+                final ZhongHeResponse zhongHeResponse1 = resultInternal.getZhongHeResponse();
+                final CmdEnum cmdEnum = zhongHeResponse1.getCmdEnum();
+                final String para = zhongHeResponse1.getPara();
+                if ((cmdEnum != CmdEnum.PRO_TIMING_TASK && "01".equals(para)) && cmdEnum != CmdEnum.UPLOAD_MEDIA_FILE && cmdEnum != CmdEnum.SEND_STATE) {
+                    SyncResultSupport.labelResultCountDownMap.get(label).countDown();
+                }
             }
         } finally {
             ZhongHeClientLockProxy.ZHONG_HE_CLIENT_THREAD_LOCAL.remove();
             LABEL_THREAD_LOCAL.remove();
-            SyncResultSupport.labelCmdMap.remove(label);
         }
     }
 }

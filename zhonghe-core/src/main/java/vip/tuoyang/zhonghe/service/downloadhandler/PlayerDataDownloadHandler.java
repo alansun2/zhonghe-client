@@ -37,9 +37,14 @@ public class PlayerDataDownloadHandler implements DownLoadResultHandler {
             TerminalDataResponse terminalDataResponse = new TerminalDataResponse();
             terminalDataResponse.setTerminalNo(ServiceUtils.changeOrder(s.substring(0, 8), 2));
             terminalDataResponse.setTerminalStatus(Byte.parseByte(s.substring(8, 10), 16));
-            int startIndex = 18;
-            int endIndex = Integer.parseInt(s.substring(16, 18), 16) * 2;
-            terminalDataResponse.setTerminalName(ServiceUtils.getContentFromHex(s.substring(startIndex, startIndex + endIndex)));
+            final int length = Integer.parseInt(s.substring(16, 18), 16);
+            if (length != 0) {
+                int startIndex = 18;
+                int endIndex = length * 2 + startIndex;
+                terminalDataResponse.setTerminalName(ServiceUtils.getContentFromHex(s.substring(startIndex, endIndex)));
+            } else {
+                terminalDataResponse.setTerminalName("未命名");
+            }
             return terminalDataResponse;
         }).collect(Collectors.toList());
 

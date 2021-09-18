@@ -26,20 +26,20 @@ public class EditableTask implements TaskGenerator {
     @Override
     public String generator(String id, TaskRequest request) {
 
-        return id + request.getTaskType() + "00" +
+        return id + request.getTaskTypeHex() + "00" +
                 // timeType timeMode
                 request.getTime() +
                 request.getStartTimeHex() +
                 request.getEndTimeHex() +
-                request.getWeek() +
-                request.getPlayWay() +
+                request.getWeekHex() +
+                request.getPlayWayHex() +
                 request.getPlayContentLen() +
                 request.getPlayObjectLen() +
-                request.getVolume() +
-                request.getOpenInAdvanceTime() +
+                request.getVolumeHex() +
+                request.getOpenInAdvanceTimeHex() +
                 // 保留
                 "0000" +
-                request.getTaskName() +
+                request.getTaskNameHex() +
                 request.getPlayContent() +
                 request.getPlayObject();
     }
