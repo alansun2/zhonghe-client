@@ -113,7 +113,7 @@ public class ServiceConfig implements SchedulingConfigurer {
         final String activeProfile = environment.getActiveProfiles()[0];
         final String path = ServiceConfig.class.getResource("/").getPath();
         if ("pro".equals(activeProfile)) {
-            installDir = path.substring(6, path.indexOf("zhonghe-broadcast") + 17);
+            installDir = path.substring(6, path.lastIndexOf("zhonghe-broadcast") + 17);
             installInfoPath = installDir + "/install-info.txt";
         } else {
             installDir = serviceSystemProperties.getInstallDir();
