@@ -33,6 +33,7 @@
 
     <Loggers>
         <Root level="info">
+            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="file-info"/>
         </Root>
     </Loggers>
