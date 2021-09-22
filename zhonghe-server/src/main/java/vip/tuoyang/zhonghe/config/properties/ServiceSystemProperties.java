@@ -127,6 +127,7 @@ public class ServiceSystemProperties {
             AssertUtils.notBlank(deviceId, "deviceId 必填");
             AssertUtils.notBlank(managerCode, "managerCode 必填");
             AssertUtils.notBlank(deviceDes, "deviceDes 必填");
+            AssertUtils.notNull(nasIp, "nasIp 必填");
             AssertUtils.notNull(nasConnectPort, "nasConnectPort 必填");
             AssertUtils.notNull(nasControlPort, "nasControlPort 必填");
             AssertUtils.notNull(nasCapturePort, "nasCapturePort 必填");

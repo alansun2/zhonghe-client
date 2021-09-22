@@ -73,12 +73,9 @@ public class ServiceConfig implements SchedulingConfigurer {
         zhongHeConfig.valid();
 
         // 优先获取设置的 ip
-        final String publicIp = IpUtils.getPublicIp();
-        AssertUtils.notNull(publicIp, "获取公网ip失败");
-        if (zhongHeConfig.getNasIp() == null) {
-            zhongHeConfig.setNasIp(publicIp);
-        }
         if (zhongHeConfig.getMiddleWareIp() == null) {
+            final String publicIp = IpUtils.getPublicIp();
+            AssertUtils.notNull(publicIp, "获取公网ip失败");
             zhongHeConfig.setMiddleWareIp(publicIp);
         }
         zhongHeConfig.setFileUploadUrl("http://" + zhongHeConfig.getMiddleWareIp() + ":" + environment.getProperty("server.port") + serviceSystemProperties.getFileUploadPath());
