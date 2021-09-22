@@ -42,7 +42,7 @@ public class ZhongHeControlService {
         List<Header> headers = new ArrayList<>();
         headers.add(new BasicHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE));
         headers.add(new BasicHeader("secret", serviceSystemProperties.getSecret()));
-        final HttpParams httpParams = HttpParams.builder().url("http://" + zhongHeClient.getZhongHeConfig().getNasIp() + ":8084" + "/common/reboot").headers(headers).build();
+        final HttpParams httpParams = HttpParams.builder().url("http://" + zhongHeClient.getZhongHeConfig().getMiddleWareIp() + ":8084" + "/common/reboot").headers(headers).build();
         try {
             final HttpResponse httpResponse = HttpClientUtils.doPost(httpParams);
             final StatusLine statusLine = httpResponse.getStatusLine();
