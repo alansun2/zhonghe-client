@@ -97,10 +97,13 @@ public class ZhongHeSendClient {
         return (ZhongHeResult<String>) this.getResult(label, zhongHeBaseRequest);
     }
 
-    public ZhongHeResult<?> deleteMediaFile(String label, String fileName) {
-        ZhongHeDto<String> zhongHeBaseRequest = new ZhongHeDto<>();
+    public ZhongHeResult<?> deleteMediaFile(String label, String fileNo, String fileName) {
+        ZhongHeDto<FileUploadRequest> zhongHeBaseRequest = new ZhongHeDto<>();
         zhongHeBaseRequest.setCommand((byte) 9);
-        zhongHeBaseRequest.setData(fileName);
+        FileUploadRequest fileUploadRequest = new FileUploadRequest();
+        fileUploadRequest.setFileNo(fileNo);
+        fileUploadRequest.setFileName(fileName);
+        zhongHeBaseRequest.setData(fileUploadRequest);
         return this.getResult(label, zhongHeBaseRequest);
     }
 

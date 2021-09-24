@@ -67,8 +67,8 @@ public class TestController {
     }
 
     @PostMapping("deleteMediaFile")
-    public ZhongHeResult<?> deleteMediaFile(String label, String fileName) {
-        return zhongHeSendClient.deleteMediaFile(label, fileName);
+    public ZhongHeResult<?> deleteMediaFile(String label, String fileNo, String fileName) {
+        return zhongHeSendClient.deleteMediaFile(label, fileNo, fileName);
     }
 
     @PostMapping("getPlayersByNos")

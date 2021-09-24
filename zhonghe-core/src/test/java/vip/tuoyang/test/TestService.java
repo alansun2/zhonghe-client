@@ -14,7 +14,6 @@ import vip.tuoyang.zhonghe.service.ZhongHeClient;
 import vip.tuoyang.zhonghe.service.ZhongHeConnectionManager;
 import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 
-import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -192,16 +191,18 @@ public class TestService {
     @Test
     public void abortTask() {
         final ZhongHeResult<?> zhongHeResult = zhongHeClient.abortTaskBySubId("D54DF001");
+        System.out.println(zhongHeResult);
     }
 
     @Test
-    public void uploadMediaFile() throws FileNotFoundException {
+    public void uploadMediaFile() {
         final ZhongHeResult<String> zhongHeResult = zhongHeClient.uploadMediaFile("周杰伦 - 园游会.mp3");
         System.out.println(zhongHeResult.getData());
     }
 
     @Test
     public void deleteMediaFile() {
-        zhongHeClient.deleteMediaFile("001E", "周杰伦 - 园游会.mp3");
+        final ZhongHeResult<?> zhongHeResult = zhongHeClient.deleteMediaFile("001E", "周杰伦 - 园游会.mp3");
+        System.out.println(zhongHeResult);
     }
 }

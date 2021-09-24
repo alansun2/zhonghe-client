@@ -10,6 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FileUploadRequest {
+    private String fileNo;
+
     private String fileName;
 
     private String contentBase64;
