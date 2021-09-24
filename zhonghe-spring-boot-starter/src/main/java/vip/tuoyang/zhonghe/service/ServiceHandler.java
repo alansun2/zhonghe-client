@@ -55,52 +55,68 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
             commandEndIndex = msg.length() - 1;
         }
         byte command = Byte.parseByte(msg.substring(commandStartIndex, commandEndIndex));
-        switch (command) {
-            case 1:
-            case 5:
-            case 7:
-            case 9:
-            case 12:
-                ZhongHeDto<ZhongHeResult<Object>> zhongHeResult = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<Object>>>() {
-                });
+        try {
+            switch (command) {
+                case 1:
+                case 5:
+                case 7:
+                case 9:
+                case 12:
+                    ZhongHeDto<ZhongHeResult<Object>> zhongHeResult = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<Object>>>() {
+                    });
+                    this.resultHandle(zhongHeResult);
+                    break;
+                case 2:
+                    final ZhongHeDto<ZhongHeResult<StateResponse>> zhongHeResult2 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<StateResponse>>>() {
+                    });
+                    this.resultHandle(zhongHeResult2);
+                    break;
+                case 3:
+                case 4:
+                case 6:
+                case 8:
+                    final ZhongHeDto<ZhongHeResult<String>> zhongHeResult3 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<String>>>() {
+                    });
+                    this.resultHandle(zhongHeResult3);
+                    break;
+                case 10:
+                    final ZhongHeDto<ZhongHeResult<List<TerminalDataResponse>>> zhongHeResult10 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<List<TerminalDataResponse>>>>() {
+                    });
+                    this.resultHandle(zhongHeResult10);
+                    break;
+                case 11:
+                    final ZhongHeDto<ZhongHeResult<List<GroupDataResponse>>> zhongHeResult11 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<List<GroupDataResponse>>>>() {
+                    });
+                    this.resultHandle(zhongHeResult11);
+                    break;
+                case 13:
+                    ZhongHeDto<StateRequest> requestZhongHeBaseRequest13 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<StateRequest>>() {
+                    });
+                    serviceZhongHeCallback.stateChange(requestZhongHeBaseRequest13.getData());
+                    break;
+                case 14:
+                    ZhongHeDto<ZhongHeConfig> requestZhongHeBaseRequest14 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeConfig>>() {
+                    });
+                    LABEL_CHANNEL_MAP.put(requestZhongHeBaseRequest14.getLabel(), ctx.channel());
+                    if (requestZhongHeBaseRequest14.getData() != null) {
+                        serviceZhongHeCallback.serverInit(requestZhongHeBaseRequest14.getData());
+                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException("不支持的指令: msg: " + msg);
+            }
+        } catch (Throwable t) {
+            log.error("error", t);
+            if (t instanceof BizException) {
+                ZhongHeDto<ZhongHeResult<Object>> zhongHeResult = new ZhongHeDto<>();
+                ZhongHeResult<Object> objectZhongHeResult = new ZhongHeResult<>();
+                objectZhongHeResult.setSuccess(false);
+                objectZhongHeResult.setErrorMsg(t.getMessage());
+                zhongHeResult.setData(objectZhongHeResult);
                 this.resultHandle(zhongHeResult);
-                break;
-            case 2:
-                final ZhongHeDto<ZhongHeResult<StateResponse>> zhongHeResult2 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<StateResponse>>>() {
-                });
-                this.resultHandle(zhongHeResult2);
-                break;
-            case 3:
-            case 4:
-            case 6:
-            case 8:
-                final ZhongHeDto<ZhongHeResult<String>> zhongHeResult3 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<String>>>() {
-                });
-                this.resultHandle(zhongHeResult3);
-                break;
-            case 10:
-                final ZhongHeDto<ZhongHeResult<List<TerminalDataResponse>>> zhongHeResult10 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<List<TerminalDataResponse>>>>() {
-                });
-                this.resultHandle(zhongHeResult10);
-                break;
-            case 11:
-                final ZhongHeDto<ZhongHeResult<List<GroupDataResponse>>> zhongHeResult11 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<List<GroupDataResponse>>>>() {
-                });
-                this.resultHandle(zhongHeResult11);
-                break;
-            case 13:
-                ZhongHeDto<StateRequest> requestZhongHeBaseRequest13 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<StateRequest>>() {
-                });
-                serviceZhongHeCallback.stateChange(requestZhongHeBaseRequest13.getData());
-                break;
-            case 14:
-                ZhongHeDto<ZhongHeConfig> requestZhongHeBaseRequest14 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeConfig>>() {
-                });
-                LABEL_CHANNEL_MAP.put(requestZhongHeBaseRequest14.getLabel(), ctx.channel());
-                serviceZhongHeCallback.serverInit(requestZhongHeBaseRequest14.getData());
-                break;
-            default:
-                throw new BizException("不支持的指令: msg: " + msg);
+            } else {
+                throw t;
+            }
         }
     }
 

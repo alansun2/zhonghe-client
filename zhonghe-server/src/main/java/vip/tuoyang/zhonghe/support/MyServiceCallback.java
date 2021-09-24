@@ -1,7 +1,6 @@
 package vip.tuoyang.zhonghe.support;
 
-import vip.tuoyang.zhonghe.bean.ZhongHeDto;
-import vip.tuoyang.zhonghe.config.ZhongHeConfig;
+import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 import vip.tuoyang.zhonghe.nettyclient.BroadcastClient;
 
 /**
@@ -9,6 +8,11 @@ import vip.tuoyang.zhonghe.nettyclient.BroadcastClient;
  * @date 2021/9/23 16:43
  */
 public class MyServiceCallback implements ServiceCallback {
+    public ServiceSystemProperties serviceSystemProperties;
+
+    public MyServiceCallback(ServiceSystemProperties serviceSystemProperties) {
+        this.serviceSystemProperties = serviceSystemProperties;
+    }
 
     /**
      * 重连
@@ -17,8 +21,6 @@ public class MyServiceCallback implements ServiceCallback {
      */
     @Override
     public void reconnect(BroadcastClient broadcastClient) {
-        ZhongHeDto<ZhongHeConfig> zhongHeBaseRequest = new ZhongHeDto<>();
-        zhongHeBaseRequest.setCommand((byte) 14);
-        broadcastClient.sendMessage(zhongHeBaseRequest);
+        broadcastClient.sendMessage("token:" + serviceSystemProperties.getSecret());
     }
 }

@@ -17,7 +17,7 @@ public class ServiceSystemProperties {
     /**
      * 请求密码
      */
-    private String secret;
+    private String secret = "dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^";
     /**
      * 超时时间
      */
@@ -25,5 +25,5 @@ public class ServiceSystemProperties {
     /**
      * tcp 端口号
      */
-    private int tcpPort;
+    private int tcpPort = 9000;
 }

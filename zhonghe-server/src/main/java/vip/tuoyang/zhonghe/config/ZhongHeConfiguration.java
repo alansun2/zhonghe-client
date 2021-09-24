@@ -4,14 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import vip.tuoyang.base.codec.jackson.JacksonConfig;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 import vip.tuoyang.zhonghe.nettyclient.BroadcastClient;
-import vip.tuoyang.zhonghe.service.ServiceHandler;
 import vip.tuoyang.zhonghe.nettyclient.codec.ZhongHeDtoEncoder;
+import vip.tuoyang.zhonghe.service.ServiceHandler;
 import vip.tuoyang.zhonghe.service.ZhongHeClient;
 import vip.tuoyang.zhonghe.service.ZhongHeClientImpl;
 import vip.tuoyang.zhonghe.support.MyCallbackHandler;
@@ -53,13 +52,19 @@ public class ZhongHeConfiguration {
     }
 
     @Bean
+    public MyServiceCallback myServiceCallback() {
+        return new MyServiceCallback(serviceSystemProperties);
+    }
+
+    @Bean
     public ZhongHeClient zhongHeClient() {
-        return ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(serviceSystemProperties.getZhongHeConfig(), "label", zhongHeCallback()), "label");
+        final String label = serviceSystemProperties.getZhongHeConfig().getLabel();
+        return ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(serviceSystemProperties.getZhongHeConfig(), label, zhongHeCallback()), label);
     }
 
     @Bean
     public BroadcastClient broadcastClient() {
-        BroadcastClient broadcastClient = new BroadcastClient(this.broadcastHandler(), zhongHeDtoEncoder(), new MyServiceCallback(), serviceSystemProperties.getTcpPort(), serviceSystemProperties.getTcpHost());
+        BroadcastClient broadcastClient = new BroadcastClient(this.broadcastHandler(), zhongHeDtoEncoder(), myServiceCallback(), serviceSystemProperties.getTcpPort(), serviceSystemProperties.getTcpHost());
         broadcastClient.connect();
         broadcastClient.sendMessage("token:" + serviceSystemProperties.getSecret());
         ZhongHeDto<ZhongHeConfig> zhongHeBaseRequest = new ZhongHeDto<>();
