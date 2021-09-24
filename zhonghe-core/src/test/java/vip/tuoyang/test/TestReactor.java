@@ -61,7 +61,6 @@ public class TestReactor {
         zhongHeConfig.setNasConnectPort(8100);
         zhongHeConfig.setNasControlPort(8101);
         zhongHeConfig.setNasCapturePort(8201);
-        zhongHeConfig.setFileUploadUrl("http://localhost:8084/common/upload-file");
         SendClient sendClient = new SendClient(zhongHeConfig, "test", (label, stateHandler) -> {
         });
 

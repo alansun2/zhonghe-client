@@ -11,3 +11,4 @@ spring:
 
 system:
   secret: dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^
+  tcp-port: 9000

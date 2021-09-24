@@ -45,7 +45,8 @@ public class ZhongHeConnectionManager {
     /**
      * 新增或重置连接
      */
-    public void addOrResetConnection(String label, ZhongHeConfig zhongHeConfig) {
+    public void addOrResetConnection(ZhongHeConfig zhongHeConfig) {
+        final String label = zhongHeConfig.getLabel();
         final ZhongHeClient zhongHeClient = labelClientMap.get(label);
         if (zhongHeClient != null) {
             zhongHeClient.close(true);

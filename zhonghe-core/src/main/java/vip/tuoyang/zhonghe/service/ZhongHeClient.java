@@ -6,9 +6,7 @@ import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.MediaFileDataResponse;
 import vip.tuoyang.zhonghe.bean.response.StateResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
-import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -17,8 +15,6 @@ import java.util.List;
  */
 public interface ZhongHeClient {
     SendClient getSendClient();
-
-    ZhongHeConfig getZhongHeConfig();
 
     /**
      * test
@@ -70,7 +66,8 @@ public interface ZhongHeClient {
     /**
      * 删除定时任务
      *
-     * @param id id
+     * @param id      id
+     * @param request {@link TaskRequest}
      * @return {@link ZhongHeResult}
      */
     ZhongHeResult<?> deleteTimingTask(String id, TaskRequest request);
@@ -96,19 +93,19 @@ public interface ZhongHeClient {
     /**
      * 上传文件
      *
-     * @param inputStream inputStream
-     * @param fileName    fileName
+     * @param filePath filePath
      * @return {@link ZhongHeResult}
      */
-    ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName);
+    ZhongHeResult<String> uploadMediaFile(String filePath);
 
     /**
      * 删除媒体文件
      *
-     * @param fileId fileId
+     * @param fileId   fileId
+     * @param filePath filePath
      * @return {@link ZhongHeResult}
      */
-    ZhongHeResult<?> deleteMediaFile(String fileId, String fileName);
+    ZhongHeResult<?> deleteMediaFile(String fileId, String filePath);
 
     //------------------------------download data-----------------------------------------------------------------------
 

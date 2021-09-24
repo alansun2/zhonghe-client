@@ -2,7 +2,7 @@ package vip.tuoyang.zhonghe;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import vip.tuoyang.zhonghe.bean.request.IpChangeRequest;
+import vip.tuoyang.zhonghe.bean.request.StateRequest;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 import vip.tuoyang.zhonghe.support.ServiceZhongHeCallback;
 
@@ -13,15 +13,6 @@ import vip.tuoyang.zhonghe.support.ServiceZhongHeCallback;
 @Slf4j
 @Component
 public class IpChangeCallbackImpl implements ServiceZhongHeCallback {
-    /**
-     * 处理 ip 变化回调
-     *
-     * @param request {@link IpChangeRequest}
-     */
-    @Override
-    public void ipChange(IpChangeRequest request) {
-        log.info("接收到参数: [{}]", request);
-    }
 
     /**
      * 服务初始化
@@ -31,5 +22,15 @@ public class IpChangeCallbackImpl implements ServiceZhongHeCallback {
     @Override
     public void serverInit(ZhongHeConfig zhongHeConfig) {
         log.info("接收到参数: zhongHeConfig: [{}]", zhongHeConfig);
+    }
+
+    /**
+     * 广播服务状态修改时回调
+     *
+     * @param stateRequest {@link StateRequest}
+     */
+    @Override
+    public void stateChange(StateRequest stateRequest) {
+        log.info("label: [{}], state: [{}]", stateRequest.getLabel(), stateRequest.getState());
     }
 }

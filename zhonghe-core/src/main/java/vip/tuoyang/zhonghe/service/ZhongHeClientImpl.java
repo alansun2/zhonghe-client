@@ -2,16 +2,8 @@ package vip.tuoyang.zhonghe.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.AssertUtils;
-import vip.tuoyang.base.util.HttpClientUtils;
-import vip.tuoyang.base.util.bean.HttpParams;
 import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.bean.ZhongHeDownloadResult;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
@@ -32,11 +24,6 @@ import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -70,11 +57,6 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public SendClient getSendClient() {
         return sendClient;
-    }
-
-    @Override
-    public ZhongHeConfig getZhongHeConfig() {
-        return zhongHeConfig;
     }
 
     /**
@@ -251,53 +233,23 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     /**
      * 上传文件
      *
-     * @param inputStream inputStream
-     * @param fileName    fileName
+     * @param filePath filePath
      * @return 媒体文件 id
      */
     @Override
-    public ZhongHeResult<String> uploadMediaFile(InputStream inputStream, String fileName) {
-        AssertUtils.notNull(inputStream, "inputStream null error");
-        AssertUtils.notBlank(fileName, "fileName null error");
+    public ZhongHeResult<String> uploadMediaFile(String filePath) {
+        AssertUtils.notBlank(filePath, "filePath null error");
 
         ZhongHeResult<String> zhongHeResult = new ZhongHeResult<>();
-        HttpResponse httpResponse;
-        try {
-            String uploadUrl = zhongHeConfig.getFileUploadUrl() + "?fileName=" + URLEncoder.encode(fileName, Charset.defaultCharset().toString());
-            final InputStreamEntity inputStreamEntity = new InputStreamEntity(inputStream);
-            final HttpParams httpParams = HttpParams.builder().url(uploadUrl).httpEntity(inputStreamEntity).headers(Collections.singletonList(new BasicHeader("secret", ZhongHeSystemProperties.secret))).build();
-            httpResponse = HttpClientUtils.doPost(httpParams);
-        } catch (IOException e) {
-            log.error("上传文件失败, 请求失败", e);
-            zhongHeResult.setSuccess(false);
-            zhongHeResult.setErrorMsg("上传文件失败:" + (e.getMessage().length() > 50 ? e.getMessage().substring(0, 50) : e.getMessage()));
-            return zhongHeResult;
-        }
-
-        final StatusLine statusLine = httpResponse.getStatusLine();
-        if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-            String filePath;
-            try {
-                filePath = EntityUtils.toString(httpResponse.getEntity());
-            } catch (IOException e) {
-                log.error("上传文件失败, 获取文件路径失败", e);
-                zhongHeResult.setSuccess(false);
-                zhongHeResult.setErrorMsg("上传文件失败2:" + (e.getMessage().length() > 50 ? e.getMessage().substring(0, 50) : e.getMessage()));
-                return zhongHeResult;
-            }
-            // 转 16 进制
-            final String filePathHex = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(filePath));
-            String content = "0000" + ConvertCode.intToHexString(filePathHex.length() / 2, 1) + filePathHex;
-            final ResultInternal resultInternal = sendClient.send(CmdEnum.UPLOAD_MEDIA_FILE, "00", content);
-            if (resultInternal.isSuccess()) {
-                zhongHeResult.setData(resultInternal.getData().toString());
-            } else {
-                zhongHeResult.setSuccess(false);
-                zhongHeResult.setErrorMsg(resultInternal.getErrorMsg());
-            }
+        // 转 16 进制
+        final String filePathHex = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(filePath));
+        String content = "0000" + ConvertCode.intToHexString(filePathHex.length() / 2, 1) + filePathHex;
+        final ResultInternal resultInternal = sendClient.send(CmdEnum.UPLOAD_MEDIA_FILE, "00", content);
+        if (resultInternal.isSuccess()) {
+            zhongHeResult.setData(resultInternal.getData().toString());
         } else {
             zhongHeResult.setSuccess(false);
-            zhongHeResult.setErrorMsg("上传文件失败1");
+            zhongHeResult.setErrorMsg(resultInternal.getErrorMsg());
         }
 
         return zhongHeResult;
@@ -306,16 +258,17 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     /**
      * 删除媒体文件
      *
-     * @param fileId fileId
+     * @param fileId   fileId
+     * @param filePath filePath
      * @return {@link ZhongHeResult}
      */
     @Override
-    public ZhongHeResult<?> deleteMediaFile(String fileId, String fileName) {
-        String fileNameHex = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(fileName)).toUpperCase();
-        if ((fileNameHex.length() | 1) == 1) {
-            fileNameHex = fileNameHex + 0;
+    public ZhongHeResult<?> deleteMediaFile(String fileId, String filePath) {
+        String filePathHex = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(filePath)).toUpperCase();
+        if ((filePathHex.length() | 1) == 1) {
+            filePathHex = filePathHex + 0;
         }
-        String content = ServiceUtils.changeOrder(fileId, 2) + ConvertCode.intToHexString(fileNameHex.length() / 2, 1) + fileNameHex;
+        String content = ServiceUtils.changeOrder(fileId, 2) + ConvertCode.intToHexString(filePathHex.length() / 2, 1) + filePathHex;
         return sendClient.send(CmdEnum.DELETE_MEDIA_FILE, "00", content).toZhongHeResult();
     }
 

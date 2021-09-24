@@ -1,6 +1,6 @@
 package vip.tuoyang.zhonghe.support;
 
-import vip.tuoyang.zhonghe.bean.request.IpChangeRequest;
+import vip.tuoyang.zhonghe.bean.request.StateRequest;
 import vip.tuoyang.zhonghe.config.ZhongHeConfig;
 
 /**
@@ -11,16 +11,16 @@ import vip.tuoyang.zhonghe.config.ZhongHeConfig;
  */
 public interface ServiceZhongHeCallback {
     /**
-     * 处理 ip 变化回调
-     *
-     * @param request {@link IpChangeRequest}
-     */
-    void ipChange(IpChangeRequest request);
-
-    /**
      * 服务初始化
      *
      * @param zhongHeConfig {@link ZhongHeConfig}
      */
     void serverInit(ZhongHeConfig zhongHeConfig);
+
+    /**
+     * 广播服务状态修改时回调
+     *
+     * @param stateRequest {@link StateRequest}
+     */
+    void stateChange(StateRequest stateRequest);
 }

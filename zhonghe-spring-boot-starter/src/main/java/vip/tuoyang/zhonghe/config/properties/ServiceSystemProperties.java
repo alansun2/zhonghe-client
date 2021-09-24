@@ -22,4 +22,8 @@ public class ServiceSystemProperties {
      * 超时时间
      */
     private int timeout = 5;
+    /**
+     * tcp 端口号
+     */
+    private int tcpPort;
 }

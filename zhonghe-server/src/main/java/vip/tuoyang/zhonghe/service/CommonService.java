@@ -1,18 +1,14 @@
 package vip.tuoyang.zhonghe.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vip.tuoyang.base.constants.SeparatorConstants;
-import vip.tuoyang.zhonghe.bean.request.BroadcastInstallPath;
+import vip.tuoyang.zhonghe.bean.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -25,18 +21,6 @@ import java.io.InputStream;
 public class CommonService {
     @Autowired
     private ServiceSystemProperties serviceSystemProperties;
-
-    /**
-     * 文件上传
-     *
-     * @return 文件地址
-     */
-    public String uploadFile(HttpServletRequest request, String fileName) throws IOException {
-        final ServletInputStream inputStream = request.getInputStream();
-        final String filePath = serviceSystemProperties.getFileDir() + fileName;
-        FileUtils.copyInputStreamToFile(inputStream, new File(filePath));
-        return filePath;
-    }
 
     /**
      * 重启 nas 和中间件

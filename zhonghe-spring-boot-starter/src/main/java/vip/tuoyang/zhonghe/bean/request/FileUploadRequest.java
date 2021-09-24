@@ -5,12 +5,12 @@ import lombok.Setter;
 
 /**
  * @author AlanSun
- * @date 2021/9/17 16:42
+ * @date 2021/9/22 16:51
  */
 @Getter
 @Setter
-public class BroadcastInstallPath {
-    private String middleWarePath;
+public class FileUploadRequest {
+    private String fileName;
 
-    private String nasPath;
+    private String contentBase64;
 }

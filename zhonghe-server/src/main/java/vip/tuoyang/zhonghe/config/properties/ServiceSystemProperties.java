@@ -5,8 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import vip.tuoyang.base.util.AssertUtils;
-import vip.tuoyang.base.util.CheckUtils;
-import vip.tuoyang.zhonghe.bean.request.BroadcastInstallPath;
+import vip.tuoyang.zhonghe.bean.BroadcastInstallPath;
 
 /**
  * @author AlanSun
@@ -26,25 +25,18 @@ public class ServiceSystemProperties {
      */
     private String secret = "dPO32$#kgJ5i&kjw1bjgdk34kbma13iYIo3*^";
     /**
-     * 是否开启 ip 上报
+     * 超时时间
      */
-    private boolean ipReportSwitch = true;
-    /**
-     * ip 改变时上报的地址
-     */
-    private String serverUrl;
-    /**
-     * 文件上传路径
-     */
-    private String fileUploadPath = "/common/upload-file";
-    /**
-     * 路径
-     */
-    private Path path = new Path();
+    private Integer timeout = 5;
+
+    private Integer tcpPort;
+
+    private String tcpHost;
+
     /**
      * 配置
      */
-    private ZhongHeConfig zhongHeConfig = new ZhongHeConfig();
+    private vip.tuoyang.zhonghe.config.ZhongHeConfig zhongHeConfig = new vip.tuoyang.zhonghe.config.ZhongHeConfig();
 
     /**
      * 广播 nas 和中间件的安装目录, 测试时使用
@@ -53,17 +45,9 @@ public class ServiceSystemProperties {
 
     private BroadcastInstallPath broadcastInstallPath;
 
-    @Getter
-    @Setter
-    public static class Path {
-        /**
-         * 服务初始化
-         */
-        private String serverInit = "/common/server-init";
-        /**
-         * ip 改变
-         */
-        private String ipChange = "/common/ip-report";
+    public void valid() {
+        AssertUtils.notNull(tcpPort, "tcpPort 必填");
+        AssertUtils.notNull(tcpHost, "tcpHost 必填");
     }
 
     /**
@@ -72,6 +56,8 @@ public class ServiceSystemProperties {
      */
     @Getter
     @Setter
+    @Configuration(proxyBeanMethods = false)
+    @ConfigurationProperties(value = "system.zhong-he-config")
     public static class ZhongHeConfig {
         /**
          * 设备 id
@@ -81,6 +67,10 @@ public class ServiceSystemProperties {
          * 管理码
          */
         private String managerCode;
+        /**
+         * 本地绑定端口
+         */
+        private Integer localBindPort;
         /**
          * 设备描述
          */
@@ -120,25 +110,5 @@ public class ServiceSystemProperties {
         private String label;
 
         private String deviceAddress;
-
-        private String fileUploadUrl;
-
-        public void valid() {
-            AssertUtils.notBlank(deviceId, "deviceId 必填");
-            AssertUtils.notBlank(managerCode, "managerCode 必填");
-            AssertUtils.notBlank(deviceDes, "deviceDes 必填");
-            AssertUtils.notNull(nasIp, "nasIp 必填");
-            AssertUtils.notNull(nasConnectPort, "nasConnectPort 必填");
-            AssertUtils.notNull(nasControlPort, "nasControlPort 必填");
-            AssertUtils.notNull(nasCapturePort, "nasCapturePort 必填");
-            AssertUtils.notNull(label, "label 必填");
-            AssertUtils.notNull(deviceAddress, "deviceAddress 必填");
-
-            AssertUtils.isTrue(CheckUtils.portCheck(middleWarePort, nasConnectPort, nasControlPort, nasCapturePort), "请检查端口范围，0~65535");
-        }
-    }
-
-    public void valid() {
-        AssertUtils.notNull(serverUrl, "服务地址必填");
     }
 }

@@ -15,13 +15,13 @@ spring:
       max-file-size: 10MB
 
 system:
-  ip-report-switch: false
-  server-url: 'http://localhost:28083'
   zhong-he-config:
     label: '330482098'
     device-id: '00001011'
     device-des: 'Alan测试'
     device-address: '设备测试学校'
     manager-code: '12345668'
-    nas-ip: '192.168.166.153'
-    middle-ware-ip: '192.168.166.153'
+    nas-ip: '192.168.31.191'
+    middle-ware-ip: '192.168.31.191'
+  tcp-host: 127.0.0.1
+  tcp-port: 9000

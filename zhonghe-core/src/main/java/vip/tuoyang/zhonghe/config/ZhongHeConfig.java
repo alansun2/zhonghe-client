@@ -25,7 +25,7 @@ public class ZhongHeConfig {
     /**
      * 本地绑定端口
      */
-    private Integer localBindPort;
+    private Integer localBindPort = 7000;
     /**
      * 设备描述
      */
@@ -61,10 +61,6 @@ public class ZhongHeConfig {
      * 2048～48000
      */
     private Integer nasCapturePort = 8201;
-    /**
-     * 文件上传地址
-     */
-    private String fileUploadUrl;
 
     private String label;
 
@@ -80,7 +76,6 @@ public class ZhongHeConfig {
         AssertUtils.notNull(nasConnectPort, "nasConnectPort 必填");
         AssertUtils.notNull(nasControlPort, "nasControlPort 必填");
         AssertUtils.notNull(nasCapturePort, "nasCapturePort 必填");
-        AssertUtils.notNull(fileUploadUrl, "fileUploadUrl 必填");
 
         AssertUtils.isTrue(CheckUtils.check(middleWareIp, CheckUtils.IPV4), "middleWareIp 格式错误");
         AssertUtils.isTrue(CheckUtils.check(nasIp, CheckUtils.IPV4), "nasIp 格式错误");
