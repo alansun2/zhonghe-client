@@ -15,7 +15,6 @@ import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
 import vip.tuoyang.zhonghe.bean.request.FileUploadRequest;
 import vip.tuoyang.zhonghe.bean.request.Task1Request;
-import vip.tuoyang.zhonghe.bean.request.TaskRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
 import java.io.ByteArrayInputStream;
@@ -61,9 +60,9 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     zhongHeResult = zhongHeClient.state();
                     break;
                 case 3:
-                    final ZhongHeDto<TaskRequest> zhongHeBaseRequest3 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<TaskRequest>>() {
+                    final ZhongHeDto<Task1Request> zhongHeBaseRequest3 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<Task1Request>>() {
                     });
-                    zhongHeResult = zhongHeClient.addTimingTask(zhongHeBaseRequest3.getData());
+                    zhongHeResult = zhongHeClient.addTimingTask(zhongHeBaseRequest3.getData().getTaskRequest());
                     break;
                 case 4:
                     final ZhongHeDto<Task1Request> zhongHeBaseRequest4 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<Task1Request>>() {
@@ -76,9 +75,9 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     zhongHeResult = zhongHeClient.deleteTimingTask(zhongHeBaseRequest5.getData().getTaskNo(), zhongHeBaseRequest5.getData().getTaskRequest());
                     break;
                 case 6:
-                    final ZhongHeDto<TaskRequest> zhongHeBaseRequest6 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<TaskRequest>>() {
+                    final ZhongHeDto<Task1Request> zhongHeBaseRequest6 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<Task1Request>>() {
                     });
-                    zhongHeResult = zhongHeClient.addEditableTask(zhongHeBaseRequest6.getData());
+                    zhongHeResult = zhongHeClient.addEditableTask(zhongHeBaseRequest6.getData().getTaskRequest());
                     break;
                 case 7:
                     final ZhongHeDto<String> zhongHeBaseRequest7 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<String>>() {

@@ -19,7 +19,7 @@ system:
     label: '330482098'
     device-id: '00001011'
     device-des: 'Alan测试'
-    device-address: '中河测试1'
+    device-address: '设备测试学校'
     manager-code: '12345668'
     nas-ip: '192.168.31.191'
     middle-ware-ip: '192.168.31.191'
