@@ -5,7 +5,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
@@ -16,7 +15,6 @@ import java.util.List;
  * @date 2021/9/23 16:03
  */
 @ChannelHandler.Sharable
-@Component
 public class ZhongHeDtoEncoder extends MessageToMessageEncoder<ZhongHeDto> {
     @Autowired
     private ServiceSystemProperties serviceSystemProperties;
