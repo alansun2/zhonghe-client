@@ -29,7 +29,7 @@ public class TestService {
     @BeforeAll
     public static void before() throws InterruptedException {
         ZhongHeConfig zhongHeConfig = new ZhongHeConfig();
-        String localIp = "192.168.31.191";
+        String localIp = "192.168.31.252";
         zhongHeConfig.setLocalBindPort(7000);
         zhongHeConfig.setDeviceDes("Alan本地");
         zhongHeConfig.setDeviceId("00001011");
