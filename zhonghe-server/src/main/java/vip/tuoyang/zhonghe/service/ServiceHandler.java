@@ -14,6 +14,7 @@ import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
 import vip.tuoyang.zhonghe.bean.request.FileUploadRequest;
+import vip.tuoyang.zhonghe.bean.request.SoftUpdateRequest;
 import vip.tuoyang.zhonghe.bean.request.Task1Request;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
@@ -115,6 +116,16 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                 case 12:
                     zhongHeResult = new ZhongHeResult<>();
                     commonService.reboot();
+                    break;
+                case 15:
+                    final ZhongHeDto<SoftUpdateRequest> zhongHeBaseRequest15 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<SoftUpdateRequest>>() {
+                    });
+                    zhongHeResult = new ZhongHeResult<>();
+                    try {
+                        commonService.update(zhongHeBaseRequest15.getData());
+                    } catch (Throwable t) {
+                        zhongHeResult.setSuccess(false);
+                    }
                     break;
                 default:
                     log.error("指令不存在, msg: [{}]", msg);

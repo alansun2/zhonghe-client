@@ -10,7 +10,20 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BroadcastInstallPath {
+    /**
+     * 安装目录
+     */
+    private String installDir;
+    /**
+     * 中河中间件路径
+     */
     private String middleWarePath;
-
+    /**
+     * nas 路径
+     */
     private String nasPath;
+    /**
+     * 管理软件路径
+     */
+    private String managePath;
 }

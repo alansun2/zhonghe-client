@@ -22,7 +22,7 @@ import vip.tuoyang.zhonghe.service.task.TimingFileTask;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
-import vip.tuoyang.zhonghe.utils.ServiceUtils;
+import vip.tuoyang.zhonghe.utils.ZhongHeUtils;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -80,11 +80,11 @@ public class ZhongHeClientImpl implements ZhongHeClient {
         //// 构建初始化数据
         StringBuilder sb = new StringBuilder();
         // 16 17 deviceId
-        sb.append(ServiceUtils.changeOrder(zhongHeConfig.getDeviceId(), 2));
+        sb.append(ZhongHeUtils.changeOrder(zhongHeConfig.getDeviceId(), 2));
         // 18 19 管理码
-        sb.append(ServiceUtils.changeOrder(zhongHeConfig.getManagerCode(), 2));
+        sb.append(ZhongHeUtils.changeOrder(zhongHeConfig.getManagerCode(), 2));
         // 20 - 51描述
-        sb.append(StringUtils.rightPad(ConvertCode.intToHexString(zhongHeConfig.getDeviceDes().length() * 2, 1) + ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(zhongHeConfig.getDeviceDes())).toUpperCase(), 64, '0'));
+        sb.append(StringUtils.rightPad(ConvertCode.intToHexString(zhongHeConfig.getDeviceDes().length() * 2, 1) + ConvertCode.bytes2HexString(ZhongHeUtils.toGbkBytes(zhongHeConfig.getDeviceDes())).toUpperCase(), 64, '0'));
         // 52 53 54, 55 nas ip
         final String nasIp = zhongHeConfig.getNasIp();
         final String[] nasIpSplit = nasIp.split("\\.");
@@ -225,7 +225,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
     @Override
     public ZhongHeResult<?> abortTaskBySubId(String id) {
         AssertUtils.notBlank(id, "id null error");
-        return sendClient.send(CmdEnum.ABORT_TASK_BY_SUB_ID, "00", ServiceUtils.changeOrder(id, 2)).toZhongHeResult();
+        return sendClient.send(CmdEnum.ABORT_TASK_BY_SUB_ID, "00", ZhongHeUtils.changeOrder(id, 2)).toZhongHeResult();
     }
 
     //-----------------------------upload-------------------------------------------------------------------------------
@@ -242,7 +242,7 @@ public class ZhongHeClientImpl implements ZhongHeClient {
 
         ZhongHeResult<String> zhongHeResult = new ZhongHeResult<>();
         // 转 16 进制
-        final String filePathHex = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(filePath));
+        final String filePathHex = ConvertCode.bytes2HexString(ZhongHeUtils.toGbkBytes(filePath));
         String content = "0000" + ConvertCode.intToHexString(filePathHex.length() / 2, 1) + filePathHex;
         final ResultInternal resultInternal = sendClient.send(CmdEnum.UPLOAD_MEDIA_FILE, "00", content);
         if (resultInternal.isSuccess()) {
@@ -264,11 +264,11 @@ public class ZhongHeClientImpl implements ZhongHeClient {
      */
     @Override
     public ZhongHeResult<?> deleteMediaFile(String fileId, String filePath) {
-        String filePathHex = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(filePath)).toUpperCase();
+        String filePathHex = ConvertCode.bytes2HexString(ZhongHeUtils.toGbkBytes(filePath)).toUpperCase();
         if ((filePathHex.length() | 1) == 1) {
             filePathHex = filePathHex + 0;
         }
-        String content = ServiceUtils.changeOrder(fileId, 2) + ConvertCode.intToHexString(filePathHex.length() / 2, 1) + filePathHex;
+        String content = ZhongHeUtils.changeOrder(fileId, 2) + ConvertCode.intToHexString(filePathHex.length() / 2, 1) + filePathHex;
         return sendClient.send(CmdEnum.DELETE_MEDIA_FILE, "00", content).toZhongHeResult();
     }
 

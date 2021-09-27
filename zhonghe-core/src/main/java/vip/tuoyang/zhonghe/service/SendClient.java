@@ -20,7 +20,7 @@ import vip.tuoyang.zhonghe.support.CountDownLatch2;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
 import vip.tuoyang.zhonghe.support.ZhongHeCallback;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
-import vip.tuoyang.zhonghe.utils.ServiceUtils;
+import vip.tuoyang.zhonghe.utils.ZhongHeUtils;
 
 import java.net.InetSocketAddress;
 import java.util.Objects;
@@ -153,9 +153,9 @@ public class SendClient {
             // 3 type 固定
             sb.append("8A");
             // 4 5 6 7 deviceId, init 时可以传0
-            sb.append(ServiceUtils.changeOrder(zhongHeConfig.getDeviceId(), 2));
+            sb.append(ZhongHeUtils.changeOrder(zhongHeConfig.getDeviceId(), 2));
             // 8 9 sn 帧数
-            sb.append(ServiceUtils.changeOrder(ConvertCode.intToHexString(atomicInteger.get(), 2), 2));
+            sb.append(ZhongHeUtils.changeOrder(ConvertCode.intToHexString(atomicInteger.get(), 2), 2));
             // 12 cmd
             sb.append(cmdEnum.getValue());
             // 13 para
@@ -165,11 +165,11 @@ public class SendClient {
             // 10 11 len
             String lenLittle = "0000";
             if (content != null) {
-                lenLittle = ServiceUtils.changeOrder(ConvertCode.intToHexString(content.length() / 2, 2), 2);
+                lenLittle = ZhongHeUtils.changeOrder(ConvertCode.intToHexString(content.length() / 2, 2), 2);
             }
             sb.insert(20, lenLittle);
             // 15 chkSum
-            sb.insert(30, ConvertCode.intToHexString(ServiceUtils.computeChkSum(sb.substring(0, 30)), 1));
+            sb.insert(30, ConvertCode.intToHexString(ZhongHeUtils.computeChkSum(sb.substring(0, 30)), 1));
             // 16 字节之后的数据
             if (content != null) {
                 sb.append(content);
@@ -212,7 +212,7 @@ public class SendClient {
         // 3 type 固定
         sb.append("8A");
         // 4 5 6 7 deviceId, init 时可以传0
-        sb.append(ServiceUtils.changeOrder(zhongHeConfig.getDeviceId(), 2));
+        sb.append(ZhongHeUtils.changeOrder(zhongHeConfig.getDeviceId(), 2));
         // 8 9 sn 帧数
         sb.append(ConvertCode.int2HexLittle((int) sn));
         // 12 cmd
@@ -224,11 +224,11 @@ public class SendClient {
         // 10 11 len
         String lenLittle = "0000";
         if (content != null) {
-            lenLittle = ServiceUtils.changeOrder(ConvertCode.intToHexString(content.length() / 2, 2), 2);
+            lenLittle = ZhongHeUtils.changeOrder(ConvertCode.intToHexString(content.length() / 2, 2), 2);
         }
         sb.insert(20, lenLittle);
         // 15 chkSum
-        sb.insert(30, ConvertCode.intToHexString(ServiceUtils.computeChkSum(sb.substring(0, 30)), 1));
+        sb.insert(30, ConvertCode.intToHexString(ZhongHeUtils.computeChkSum(sb.substring(0, 30)), 1));
         // 16 字节之后的数据
         if (content != null) {
             sb.append(content);

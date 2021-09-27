@@ -26,6 +26,7 @@ public class ZhongHeDto<T> {
      * 12: 重启
      * 13: state change
      * 14: config report
+     * 15: 软件更新
      */
     private Byte command;
 

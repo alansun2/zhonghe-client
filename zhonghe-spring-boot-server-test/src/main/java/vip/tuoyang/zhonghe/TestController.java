@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import vip.tuoyang.zhonghe.bean.SoftUpdateResponse;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
+import vip.tuoyang.zhonghe.bean.request.SoftUpdate;
 import vip.tuoyang.zhonghe.bean.request.Task1Request;
 import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.StateResponse;
@@ -84,5 +86,10 @@ public class TestController {
     @PostMapping("reboot")
     public boolean reboot(String label) {
         return zhongHeSendClient.reboot(label);
+    }
+
+    @PostMapping("soft-update")
+    public SoftUpdateResponse softUpdate(@RequestBody SoftUpdate request) {
+        return zhongHeSendClient.softUpdate(request.getLabels(), request.getSoftUpdateRequest());
     }
 }

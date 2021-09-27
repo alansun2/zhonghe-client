@@ -5,7 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import vip.tuoyang.zhonghe.constants.AcceptEnum;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
-import vip.tuoyang.zhonghe.utils.ServiceUtils;
+import vip.tuoyang.zhonghe.utils.ZhongHeUtils;
 
 /**
  * @author AlanSun
@@ -51,9 +51,9 @@ public class ZhongHeResponse {
     public static ZhongHeResponse parse(String receiveContent) {
         ZhongHeResponse zhongHeResponse = new ZhongHeResponse();
         zhongHeResponse.setOriginalData(receiveContent);
-        zhongHeResponse.setDeviceId(ServiceUtils.changeOrder(receiveContent.substring(8, 15), 2));
-        zhongHeResponse.setSn(Long.parseLong(ServiceUtils.changeOrder(receiveContent.substring(16, 20), 2), 16));
-        zhongHeResponse.setLen(Integer.parseInt(ServiceUtils.changeOrder(receiveContent.substring(20, 24), 2), 16));
+        zhongHeResponse.setDeviceId(ZhongHeUtils.changeOrder(receiveContent.substring(8, 15), 2));
+        zhongHeResponse.setSn(Long.parseLong(ZhongHeUtils.changeOrder(receiveContent.substring(16, 20), 2), 16));
+        zhongHeResponse.setLen(Integer.parseInt(ZhongHeUtils.changeOrder(receiveContent.substring(20, 24), 2), 16));
         zhongHeResponse.setCmdEnum(CmdEnum.valueBy(receiveContent.substring(24, 26)));
         zhongHeResponse.setPara(receiveContent.substring(26, 28));
         zhongHeResponse.setAcceptEnum(AcceptEnum.valueBy(receiveContent.substring(28, 30)));

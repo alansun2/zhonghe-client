@@ -34,6 +34,11 @@ public class ServiceSystemProperties {
     private String tcpHost;
 
     /**
+     * 是否启用 windows 任务, 默认启用
+     */
+    private boolean enableWinTask = true;
+
+    /**
      * 配置
      */
     private vip.tuoyang.zhonghe.config.ZhongHeConfig zhongHeConfig = new vip.tuoyang.zhonghe.config.ZhongHeConfig();
@@ -41,7 +46,7 @@ public class ServiceSystemProperties {
     /**
      * 广播 nas 和中间件的安装目录, 测试时使用
      */
-    private String installDir = "D:\\project\\jszn\\对接广播";
+    private String installDir = "D:\\project\\jszn\\对接广播\\zhonghe-broadcast1";
 
     private BroadcastInstallPath broadcastInstallPath;
 

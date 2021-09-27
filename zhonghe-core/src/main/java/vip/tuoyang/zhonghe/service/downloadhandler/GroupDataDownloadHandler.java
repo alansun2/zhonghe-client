@@ -3,7 +3,7 @@ package vip.tuoyang.zhonghe.service.downloadhandler;
 import vip.tuoyang.zhonghe.bean.ZhongHeDownloadResult;
 import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
-import vip.tuoyang.zhonghe.utils.ServiceUtils;
+import vip.tuoyang.zhonghe.utils.ZhongHeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +33,10 @@ public class GroupDataDownloadHandler implements DownLoadResultHandler {
         List<GroupDataResponse> groupDataResponseList = new ArrayList<>();
         do {
             GroupDataResponse groupDataResponse = new GroupDataResponse();
-            groupDataResponse.setNo(ServiceUtils.changeOrder(contentStr.substring(0, 8), 2));
+            groupDataResponse.setNo(ZhongHeUtils.changeOrder(contentStr.substring(0, 8), 2));
             final int len = Integer.parseInt(contentStr.substring(8, 10), 16);
             if (len != 0) {
-                groupDataResponse.setGroupName(ServiceUtils.getContentFromHex(contentStr.substring(10, 10 + len * 2)));
+                groupDataResponse.setGroupName(ZhongHeUtils.getContentFromHex(contentStr.substring(10, 10 + len * 2)));
             } else {
                 groupDataResponse.setGroupName("未命名");
             }
@@ -50,7 +50,7 @@ public class GroupDataDownloadHandler implements DownLoadResultHandler {
                 if ("00000000".equals(no)) {
                     break;
                 }
-                terminalNos.add(ServiceUtils.changeOrder(no, 2));
+                terminalNos.add(ZhongHeUtils.changeOrder(no, 2));
             }
             groupDataResponse.setTerminalNos(terminalNos);
             groupDataResponseList.add(groupDataResponse);

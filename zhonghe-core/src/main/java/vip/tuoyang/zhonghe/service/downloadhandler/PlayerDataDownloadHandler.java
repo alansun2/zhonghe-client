@@ -3,7 +3,7 @@ package vip.tuoyang.zhonghe.service.downloadhandler;
 import vip.tuoyang.zhonghe.bean.ZhongHeDownloadResult;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.support.SyncResultSupport;
-import vip.tuoyang.zhonghe.utils.ServiceUtils;
+import vip.tuoyang.zhonghe.utils.ZhongHeUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,16 +32,16 @@ public class PlayerDataDownloadHandler implements DownLoadResultHandler {
      */
     @Override
     public void handler(String para, String contentStr) {
-        final List<String> contents = ServiceUtils.partContent2ListByLength(contentStr, 80);
+        final List<String> contents = ZhongHeUtils.partContent2ListByLength(contentStr, 80);
         final List<TerminalDataResponse> terminalDataResponses = contents.stream().map(s -> {
             TerminalDataResponse terminalDataResponse = new TerminalDataResponse();
-            terminalDataResponse.setTerminalNo(ServiceUtils.changeOrder(s.substring(0, 8), 2));
+            terminalDataResponse.setTerminalNo(ZhongHeUtils.changeOrder(s.substring(0, 8), 2));
             terminalDataResponse.setTerminalStatus(Byte.parseByte(s.substring(8, 10), 16));
             final int length = Integer.parseInt(s.substring(16, 18), 16);
             if (length != 0) {
                 int startIndex = 18;
                 int endIndex = length * 2 + startIndex;
-                terminalDataResponse.setTerminalName(ServiceUtils.getContentFromHex(s.substring(startIndex, endIndex)));
+                terminalDataResponse.setTerminalName(ZhongHeUtils.getContentFromHex(s.substring(startIndex, endIndex)));
             } else {
                 terminalDataResponse.setTerminalName("未命名");
             }

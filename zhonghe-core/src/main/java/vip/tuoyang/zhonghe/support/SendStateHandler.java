@@ -4,7 +4,7 @@ import vip.tuoyang.zhonghe.bean.ResultInternal;
 import vip.tuoyang.zhonghe.bean.response.ZhongHeResponse;
 import vip.tuoyang.zhonghe.constants.CmdEnum;
 import vip.tuoyang.zhonghe.constants.StateEnum;
-import vip.tuoyang.zhonghe.utils.ServiceUtils;
+import vip.tuoyang.zhonghe.utils.ZhongHeUtils;
 
 /**
  * @author AlanSun
@@ -67,6 +67,6 @@ public class SendStateHandler {
      * @return 文件编号
      */
     public String getMediaFileNo() {
-        return ServiceUtils.changeOrder(zhongHeResponse.getContent().substring(16, 20), 2);
+        return ZhongHeUtils.changeOrder(zhongHeResponse.getContent().substring(16, 20), 2);
     }
 }

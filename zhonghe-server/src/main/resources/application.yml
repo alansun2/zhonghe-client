@@ -13,6 +13,8 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+  config:
+    location:
 
 system:
   zhong-he-config:
@@ -21,7 +23,8 @@ system:
     device-des: 'Alan测试'
     device-address: '设备测试学校'
     manager-code: '12345668'
-    nas-ip: '192.168.31.191'
-    middle-ware-ip: '192.168.31.191'
+    nas-ip: '192.168.166.155'
+    middle-ware-ip: '192.168.166.155'
   tcp-host: 127.0.0.1
   tcp-port: 9000
+

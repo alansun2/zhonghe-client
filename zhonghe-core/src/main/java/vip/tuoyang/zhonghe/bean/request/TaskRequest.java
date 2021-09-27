@@ -9,7 +9,7 @@ import vip.tuoyang.base.constants.SeparatorConstants;
 import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.utils.ConvertCode;
-import vip.tuoyang.zhonghe.utils.ServiceUtils;
+import vip.tuoyang.zhonghe.utils.ZhongHeUtils;
 
 import javax.validation.constraints.NotNull;
 import java.time.DayOfWeek;
@@ -153,7 +153,7 @@ public class TaskRequest {
     }
 
     public String getTaskNameHex() {
-        final String s = ConvertCode.bytes2HexString(ServiceUtils.toGbkBytes(taskName));
+        final String s = ConvertCode.bytes2HexString(ZhongHeUtils.toGbkBytes(taskName));
         final String len = ConvertCode.intToHexString(s.length() / 2, 1);
         return StringUtils.rightPad(len + s, 64, '0');
     }
@@ -162,14 +162,14 @@ public class TaskRequest {
         if (startTime == null) {
             return "000101000000";
         }
-        return ServiceUtils.localDateTimeToHex(startTime);
+        return ZhongHeUtils.localDateTimeToHex(startTime);
     }
 
     public String getEndTimeHex() {
         if (endTime == null) {
             return "000101000000";
         }
-        return ServiceUtils.localDateTimeToHex(endTime);
+        return ZhongHeUtils.localDateTimeToHex(endTime);
     }
 
     public String getPlayWayHex() {
@@ -236,7 +236,7 @@ public class TaskRequest {
 
         StringBuilder sb = new StringBuilder();
         for (String playContentId : playContentIdList) {
-            sb.append(ServiceUtils.changeOrder(playContentId, 2));
+            sb.append(ZhongHeUtils.changeOrder(playContentId, 2));
         }
 
         if ((playContentIdList.size() & 1) == 1) {
@@ -252,7 +252,7 @@ public class TaskRequest {
 
         StringBuilder sb = new StringBuilder();
         for (String playObjectId : playObjectIdList) {
-            sb.append(ServiceUtils.changeOrder(playObjectId, 2));
+            sb.append(ZhongHeUtils.changeOrder(playObjectId, 2));
         }
         return sb.toString();
     }
