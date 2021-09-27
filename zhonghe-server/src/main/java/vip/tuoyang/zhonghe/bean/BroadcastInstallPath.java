@@ -26,4 +26,12 @@ public class BroadcastInstallPath {
      * 管理软件路径
      */
     private String managePath;
+    /**
+     * 自己的jar文件的路径
+     */
+    private String myselfPath;
+    /**
+     * 自己的启动文件的路径
+     */
+    private String myselfRestartPath;
 }

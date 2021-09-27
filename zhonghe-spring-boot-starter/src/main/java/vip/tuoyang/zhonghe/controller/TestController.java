@@ -1,15 +1,17 @@
-package vip.tuoyang.zhonghe;
+package vip.tuoyang.zhonghe.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import vip.tuoyang.zhonghe.bean.SoftUpdateResponse;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
+import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
 import vip.tuoyang.zhonghe.bean.request.SoftUpdate;
 import vip.tuoyang.zhonghe.bean.request.Task1Request;
+import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
 import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
+import vip.tuoyang.zhonghe.bean.response.SoftUpdateResponse;
 import vip.tuoyang.zhonghe.bean.response.StateResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.service.ZhongHeSendClient;
@@ -23,7 +25,7 @@ import java.util.List;
  * @date 2021/9/23 12:31
  */
 @RestController
-@RequestMapping(value = "/test/")
+@RequestMapping(value = "/zhong-he/")
 public class TestController {
     @Autowired
     private ZhongHeSendClient zhongHeSendClient;
@@ -88,8 +90,13 @@ public class TestController {
         return zhongHeSendClient.reboot(label);
     }
 
-    @PostMapping("soft-update")
-    public SoftUpdateResponse softUpdate(@RequestBody SoftUpdate request) {
+    @PostMapping("update-zhonghe")
+    public SoftUpdateResponse zhongheSoftUpdate(@RequestBody SoftUpdate<ZhongHeSoftUpdateRequest> request) {
         return zhongHeSendClient.softUpdate(request.getLabels(), request.getSoftUpdateRequest());
+    }
+
+    @PostMapping("update-myself")
+    public SoftUpdateResponse softUpdate(@RequestBody SoftUpdate<MyselfUpdate> request) {
+        return zhongHeSendClient.updateMyself(request.getLabels(), request.getSoftUpdateRequest());
     }
 }

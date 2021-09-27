@@ -1,4 +1,4 @@
-package vip.tuoyang.zhonghe.bean;
+package vip.tuoyang.zhonghe.bean.response;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -14,7 +14,8 @@ import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.bean.SoftInfo;
-import vip.tuoyang.zhonghe.bean.request.SoftUpdateRequest;
+import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
+import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
@@ -76,7 +77,7 @@ public class CommonService {
     /**
      * 软件更新
      */
-    public void update(SoftUpdateRequest softUpdateRequest) {
+    public void update(ZhongHeSoftUpdateRequest softUpdateRequest) {
         final String version = softUpdateRequest.getVersion();
         AssertUtils.notBlank(version, "version blank error");
         final BroadcastInstallPath broadcastInstallPath = serviceSystemProperties.getBroadcastInstallPath();
@@ -117,7 +118,7 @@ public class CommonService {
         }
     }
 
-    private void copy(SoftInfo softInfo, Runtime runtime, SoftUpdateRequest softUpdateRequest, BroadcastInstallPath broadcastInstallPath) throws IOException {
+    private void copy(SoftInfo softInfo, Runtime runtime, ZhongHeSoftUpdateRequest softUpdateRequest, BroadcastInstallPath broadcastInstallPath) throws IOException {
         this.stop(runtime, 8200);
         this.stop(runtime, 8607);
 
@@ -131,6 +132,57 @@ public class CommonService {
             FileUtils.copyURLToFile(new URL(softUpdateRequest.getMiddlewareUrl()), new File(broadcastInstallPath.getMiddleWarePath()));
         }
         softInfo.setVersion(softUpdateRequest.getVersion());
+        File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
+        FileUtils.writeStringToFile(softInfoPath, JSON.toJSONString(softInfo));
+    }
+
+    /**
+     * 更新自己
+     *
+     * @param myselfUpdate {@link MyselfUpdate}
+     */
+    public void updateMyself(MyselfUpdate myselfUpdate) {
+        myselfUpdate.valid();
+        final String version = myselfUpdate.getVersion();
+
+        final BroadcastInstallPath broadcastInstallPath = serviceSystemProperties.getBroadcastInstallPath();
+        Runtime runtime = null;
+        boolean startFlag = false;
+        try {
+            runtime = Runtime.getRuntime();
+            File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
+            if (softInfoPath.exists()) {
+                final SoftInfo softInfo = JSON.parseObject(FileUtils.readFileToString(softInfoPath, Charset.defaultCharset().toString()), SoftInfo.class);
+                if (!softInfo.getVersion().equals(version)) {
+                    this.downloadMyself(softInfo, myselfUpdate, broadcastInstallPath);
+                    startFlag = true;
+                }
+            } else {
+                SoftInfo softInfo = new SoftInfo();
+                this.downloadMyself(softInfo, myselfUpdate, broadcastInstallPath);
+                startFlag = true;
+            }
+        } catch (Throwable t) {
+            log.error("更新失败", t);
+            throw new BizException("更新失败");
+        } finally {
+            if (startFlag) {
+                if (runtime != null) {
+                    try {
+                        runtime.exec(broadcastInstallPath.getMyselfRestartPath());
+                    } catch (IOException e) {
+                        log.error("更新失败,重启失败", e);
+                    }
+                }
+            }
+        }
+    }
+
+    private void downloadMyself(SoftInfo softInfo, MyselfUpdate myselfUpdate, BroadcastInstallPath broadcastInstallPath) throws IOException {
+        if (StringUtils.isNotEmpty(myselfUpdate.getMyselfUrl())) {
+            FileUtils.copyURLToFile(new URL(myselfUpdate.getMyselfUrl()), new File(broadcastInstallPath.getMyselfPath()));
+        }
+        softInfo.setVersion(myselfUpdate.getVersion());
         File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
         FileUtils.writeStringToFile(softInfoPath, JSON.toJSONString(softInfo));
     }

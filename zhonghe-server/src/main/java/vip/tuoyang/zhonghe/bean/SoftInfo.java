@@ -14,4 +14,6 @@ public class SoftInfo {
      * 软件版本号
      */
     private String version;
+
+    private String myselfVersion;
 }

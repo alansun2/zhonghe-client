@@ -1,4 +1,4 @@
-package vip.tuoyang.zhonghe.bean;
+package vip.tuoyang.zhonghe.bean.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,15 +12,11 @@ import vip.tuoyang.base.util.AssertUtils;
  */
 @Getter
 @Setter
-public class SoftUpdateRequest {
+public class ZhongHeSoftUpdateRequest {
     /**
      * 版本号
      */
     private String version;
-    /**
-     * 下载地址
-     */
-    private String downloadUrl;
     /**
      * nas url
      */

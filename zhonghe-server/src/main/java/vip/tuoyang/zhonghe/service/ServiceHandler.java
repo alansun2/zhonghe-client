@@ -14,7 +14,8 @@ import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
 import vip.tuoyang.zhonghe.bean.request.FileUploadRequest;
-import vip.tuoyang.zhonghe.bean.request.SoftUpdateRequest;
+import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
+import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
 import vip.tuoyang.zhonghe.bean.request.Task1Request;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
@@ -118,11 +119,21 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     commonService.reboot();
                     break;
                 case 15:
-                    final ZhongHeDto<SoftUpdateRequest> zhongHeBaseRequest15 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<SoftUpdateRequest>>() {
+                    final ZhongHeDto<ZhongHeSoftUpdateRequest> zhongHeBaseRequest15 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeSoftUpdateRequest>>() {
                     });
                     zhongHeResult = new ZhongHeResult<>();
                     try {
                         commonService.update(zhongHeBaseRequest15.getData());
+                    } catch (Throwable t) {
+                        zhongHeResult.setSuccess(false);
+                    }
+                    break;
+                case 16:
+                    final ZhongHeDto<MyselfUpdate> zhongHeBaseRequest16 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<MyselfUpdate>>() {
+                    });
+                    zhongHeResult = new ZhongHeResult<>();
+                    try {
+                        commonService.updateMyself(zhongHeBaseRequest16.getData());
                     } catch (Throwable t) {
                         zhongHeResult.setSuccess(false);
                     }

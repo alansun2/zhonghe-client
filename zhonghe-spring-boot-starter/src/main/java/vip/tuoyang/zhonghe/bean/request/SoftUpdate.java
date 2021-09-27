@@ -2,7 +2,6 @@ package vip.tuoyang.zhonghe.bean.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import vip.tuoyang.zhonghe.bean.SoftUpdateRequest;
 
 import java.util.List;
 
@@ -12,9 +11,9 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class SoftUpdate {
+public class SoftUpdate<T> {
 
     private List<String> labels;
 
-    private SoftUpdateRequest softUpdateRequest;
+    private T softUpdateRequest;
 }
