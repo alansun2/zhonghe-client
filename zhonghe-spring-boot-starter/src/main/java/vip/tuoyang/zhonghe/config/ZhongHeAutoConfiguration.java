@@ -11,6 +11,6 @@ import vip.tuoyang.base.util.SpringHelper;
  */
 @Import(SpringHelper.class)
 @ComponentScan(basePackages = "vip.tuoyang.zhonghe")
-@Configuration(proxyBeanMethods = true)
+@Configuration(proxyBeanMethods = false)
 public class ZhongHeAutoConfiguration {
 }
