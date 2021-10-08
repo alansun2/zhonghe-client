@@ -37,7 +37,7 @@ public class ConnectZhongHeMiddleWare implements ApplicationRunner {
         taskExecutor.execute(() -> zhongHeClient.state());
         if (serviceSystemProperties.isEnableWinTask()) {
             // 生成定时任务
-            Runtime.getRuntime().exec("schtasks /Create /SC MINUTE /TN 广播定时检查 /ST 02:05 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/schedule-check.bat");
+            Runtime.getRuntime().exec("schtasks /Create /SC MINUTE /TN 广播定时检查 /ST 03:05 /ET 23:59 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/schedule-check.bat");
             Runtime.getRuntime().exec("schtasks /Create /SC DAILY /TN 广播定时重启 /ST 01:05 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
             Runtime.getRuntime().exec("schtasks /Create /SC ONSTART /TN 广播自启 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
         }
