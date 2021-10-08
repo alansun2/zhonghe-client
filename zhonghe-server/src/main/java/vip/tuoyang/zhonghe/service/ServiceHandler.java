@@ -15,13 +15,12 @@ import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
 import vip.tuoyang.zhonghe.bean.request.FileUploadRequest;
 import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
-import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
 import vip.tuoyang.zhonghe.bean.request.Task1Request;
+import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.Base64;
+import java.net.URL;
 
 /**
  * @author AlanSun
@@ -93,13 +92,11 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     AssertUtils.notNull(fileUploadRequest8, "文件body不能为空");
                     final String fileName = fileUploadRequest8.getFileName();
                     AssertUtils.notNull(fileName, "文件名称不能为空");
-                    final String contentBase64 = fileUploadRequest8.getContentBase64();
-                    AssertUtils.notNull(fileUploadRequest8, "文件内容不能为空");
+                    final String fileUrl = fileUploadRequest8.getFileUrl();
+                    AssertUtils.notNull(fileUrl, "文件地址不能为空");
 
                     String filePath = serviceSystemProperties.getFileDir() + fileName;
-                    final byte[] decode = Base64.getDecoder().decode(contentBase64);
-                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decode);
-                    FileUtils.copyInputStreamToFile(byteArrayInputStream, new File(filePath));
+                    FileUtils.copyURLToFile(new URL(fileUrl), new File(filePath));
                     zhongHeResult = zhongHeClient.uploadMediaFile(filePath);
                     break;
                 case 9:

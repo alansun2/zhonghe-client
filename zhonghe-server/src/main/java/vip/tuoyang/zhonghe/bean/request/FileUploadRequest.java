@@ -14,5 +14,5 @@ public class FileUploadRequest {
     
     private String fileName;
 
-    private String contentBase64;
+    private String fileUrl;
 }

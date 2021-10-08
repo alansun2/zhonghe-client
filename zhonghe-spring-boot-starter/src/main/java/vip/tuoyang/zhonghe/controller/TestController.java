@@ -16,8 +16,6 @@ import vip.tuoyang.zhonghe.bean.response.StateResponse;
 import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.service.ZhongHeSendClient;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -66,8 +64,8 @@ public class TestController {
     }
 
     @PostMapping("uploadMediaFile")
-    public ZhongHeResult<String> uploadMediaFile(String label, String fileName, HttpServletRequest request) throws IOException {
-        return zhongHeSendClient.uploadMediaFile(label, fileName, request.getInputStream());
+    public ZhongHeResult<String> uploadMediaFile(String label, String fileName, String fileUrl) {
+        return zhongHeSendClient.uploadMediaFile(label, fileName, fileUrl);
     }
 
     @PostMapping("deleteMediaFile")

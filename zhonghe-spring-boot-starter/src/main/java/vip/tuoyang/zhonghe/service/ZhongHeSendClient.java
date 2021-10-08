@@ -85,19 +85,12 @@ public class ZhongHeSendClient {
         return this.getResult(label, zhongHeBaseRequest);
     }
 
-    public ZhongHeResult<String> uploadMediaFile(String label, String fileName, InputStream inputStream) {
+    public ZhongHeResult<String> uploadMediaFile(String label, String fileName, String fileUrl) {
         ZhongHeDto<FileUploadRequest> zhongHeBaseRequest = new ZhongHeDto<>();
         zhongHeBaseRequest.setCommand((byte) 8);
-        final byte[] bytes;
-        try {
-            bytes = IOUtils.toByteArray(inputStream);
-        } catch (IOException e) {
-            throw new BizException("上传文件失败");
-        }
-        final String content = Base64.getEncoder().encodeToString(bytes);
         FileUploadRequest fileUploadRequest = new FileUploadRequest();
         fileUploadRequest.setFileName(fileName);
-        fileUploadRequest.setContentBase64(content);
+        fileUploadRequest.setFileUrl(fileUrl);
         zhongHeBaseRequest.setData(fileUploadRequest);
         return (ZhongHeResult<String>) this.getResult(label, zhongHeBaseRequest);
     }
