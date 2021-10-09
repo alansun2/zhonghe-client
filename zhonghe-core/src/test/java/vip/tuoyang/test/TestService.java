@@ -29,7 +29,7 @@ public class TestService {
     @BeforeAll
     public static void before() throws InterruptedException {
         ZhongHeConfig zhongHeConfig = new ZhongHeConfig();
-        String localIp = "192.168.31.252";
+        String localIp = "192.168.166.155";
         zhongHeConfig.setLocalBindPort(7000);
         zhongHeConfig.setDeviceDes("Alan本地");
         zhongHeConfig.setDeviceId("00001011");
@@ -156,17 +156,19 @@ public class TestService {
 
     @Test
     public void instantTask() {
-        TaskRequest request = new TaskRequest();
-        request.setTaskType((byte) 0);
-        request.setTaskName("test");
-        request.setPlayMode((byte) 3);
-        request.setCount((byte) 2);
-        request.setTimeMode((byte) 2);
-        request.setTimeType((byte) 0);
-        request.setIsOpenPowerAmplifierInAdvance((byte) 1);
-        request.setIsOpenPowerAmplifierInAdvanceTime(3);
-        request.setPlayContentIdList(Collections.singletonList("0001"));
-        request.setPlayObjectIdList(Collections.singletonList("FFFFFF01"));
+//        TaskRequest request = new TaskRequest();
+//        request.setTaskType((byte) 0);
+//        request.setTaskName("小程序立即播报2021-10-09 13:24:59");
+//        request.setPlayMode((byte) 3);
+//        request.setCount((byte) 2);
+//        request.setTimeMode((byte) 2);
+//        request.setTimeType((byte) 0);
+//        request.setIsOpenPowerAmplifierInAdvance((byte) 1);
+//        request.setIsOpenPowerAmplifierInAdvanceTime(3);
+//        request.setPlayContentIdList(Collections.singletonList("0008"));
+//        request.setPlayObjectIdList(Collections.singletonList("FFFFFF01"));
+        String jsonStr = "{\"count\":1,\"endTime\":\"2021-10-09T14:00:33.853\",\"endTimeHex\":\"150a090e0021\",\"isOpenPowerAmplifierInAdvance\":0,\"isOpenPowerAmplifierInAdvanceTime\":0,\"openInAdvanceTimeHex\":\"00\",\"playContent\":\"11000000\",\"playContentIdList\":[\"0011\"],\"playContentLen\":\"02\",\"playMode\":3,\"playObject\":\"01FFFFFF\",\"playObjectIdList\":[\"FFFFFF01\"],\"playObjectLen\":\"01\",\"playWayHex\":\"0b\",\"startTime\":\"2021-10-09T14:00:31.853\",\"startTimeHex\":\"150a090e001f\",\"taskName\":\"小程序立即播报2021-10-09 14:00:28\",\"taskNameHex\":\"1fD0A1B3CCD0F2C1A2BCB4B2A5B1A8323032312D31302D30392031343A30303A\",\"taskType\":0,\"taskTypeHex\":\"00\",\"time\":\"20\",\"timeMode\":2,\"timeType\":0,\"volume\":0,\"volumeHex\":\"00\",\"weekHex\":\"00\"}";
+        final TaskRequest request = JSON.parseObject(jsonStr, TaskRequest.class);
         final ZhongHeResult<String> stringZhongHeResult = zhongHeClient.addEditableTask(request);
         System.out.println(stringZhongHeResult.getData());
     }

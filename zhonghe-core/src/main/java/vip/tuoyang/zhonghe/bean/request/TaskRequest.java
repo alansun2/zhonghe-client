@@ -153,9 +153,16 @@ public class TaskRequest {
     }
 
     public String getTaskNameHex() {
-        final String s = ConvertCode.bytes2HexString(ZhongHeUtils.toGbkBytes(taskName));
-        final String len = ConvertCode.intToHexString(s.length() / 2, 1);
-        return StringUtils.rightPad(len + s, 64, '0');
+        String taskNameLocal = taskName;
+        String taskNameHex;
+        do {
+            taskNameHex = ConvertCode.bytes2HexString(ZhongHeUtils.toGbkBytes(taskNameLocal));
+            if(taskNameHex.length() > 60){
+                taskNameLocal = taskNameLocal.substring(0, taskNameLocal.length() - 1);
+            }
+        } while (taskNameHex.length() > 60);
+        final String len = ConvertCode.intToHexString(taskNameHex.length() / 2, 1);
+        return StringUtils.rightPad(len + taskNameHex, 64, '0');
     }
 
     public String getStartTimeHex() {
