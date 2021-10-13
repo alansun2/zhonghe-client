@@ -30,7 +30,7 @@ public class TimingFileTask implements TaskGenerator {
                 id + request.getTaskTypeHex() + "00" +
                 // timeType timeMode
                 request.getTime() +
-                request.getStartTimeHex() +
+                "000101" + request.getStartTimeHex().substring(6, 12) +
                 request.getEndTimeHex() +
                 request.getWeekHex() +
                 request.getPlayWayHex() +
