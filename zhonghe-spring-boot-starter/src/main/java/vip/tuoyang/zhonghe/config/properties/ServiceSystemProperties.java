@@ -26,4 +26,8 @@ public class ServiceSystemProperties {
      * tcp 端口号
      */
     private int tcpPort = 9000;
+    /**
+     * 读取超期时间，当客户端超过这个时间未发送给心跳后连接会断开。单位秒，默认30秒
+     */
+    private int readTimeOut = 30;
 }

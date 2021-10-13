@@ -68,7 +68,7 @@ public class BroadcastServer {
 
                             @Override
                             protected void initChannel(SocketChannel socketChannel) {
-                                socketChannel.pipeline().addLast(new ReadTimeoutHandler(30))
+                                socketChannel.pipeline().addLast(new ReadTimeoutHandler(serviceSystemProperties.getReadTimeOut()))
 //                                        .addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
                                         .addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, Unpooled.copiedBuffer("%_@".getBytes())))
                                         .addLast(new StringDecoder())
