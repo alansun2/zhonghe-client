@@ -2,6 +2,7 @@ package vip.tuoyang.zhonghe.bean.request;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author AlanSun
@@ -9,6 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public class StateRequest {
 
     private String label;

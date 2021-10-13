@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceHandler extends SimpleChannelInboundHandler<String> {
 
     public static final Map<String, Channel> LABEL_CHANNEL_MAP = new ConcurrentHashMap<>(64);
+    public static final Map<ChannelHandlerContext, String> CHANNEL_LABEL_MAP = new ConcurrentHashMap<>(64);
 
     private final ObjectMapper objectMapper;
 
@@ -100,6 +101,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     ZhongHeDto<ZhongHeConfig> requestZhongHeBaseRequest14 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeConfig>>() {
                     });
                     LABEL_CHANNEL_MAP.put(requestZhongHeBaseRequest14.getLabel(), ctx.channel());
+                    CHANNEL_LABEL_MAP.put(ctx, requestZhongHeBaseRequest14.getLabel());
                     if (requestZhongHeBaseRequest14.getData() != null) {
                         serviceZhongHeCallback.serverInit(requestZhongHeBaseRequest14.getData());
                     }
@@ -133,8 +135,19 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause instanceof ReadTimeoutException) {
+            log.error("超时异常，关闭连接", cause);
+        } else {
             log.error("发生异常，关闭连接", cause);
         }
+
         ctx.close();
+
+        // 断开连接之后通知修改状态
+        final String label = CHANNEL_LABEL_MAP.get(ctx);
+        StateRequest stateRequest = new StateRequest();
+        stateRequest.setLabel(label);
+        stateRequest.setState(0);
+        log.info("关闭连接后修改状态, param: [{}]", stateRequest);
+        serviceZhongHeCallback.stateChange(stateRequest);
     }
 }

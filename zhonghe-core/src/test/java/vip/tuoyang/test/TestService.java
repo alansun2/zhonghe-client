@@ -100,22 +100,22 @@ public class TestService {
 
     @Test
     public void testAddTimingTask() {
-//        TaskRequest request = new TaskRequest();
-//        request.setTaskType((byte) 0);
-//        request.setTaskName("test1");
-//        request.setPlayMode((byte) 3);
-//        request.setCount((byte) 2);
-//        request.setStartTime(LocalDateTime.of(2021, 9, 15, 9, 30, 0));
-//        request.setEndTime(LocalDateTime.of(2021, 9, 15, 9, 33, 9));
-//        request.setTimeMode((byte) 0);
-//        request.setTimeType((byte) 1);
-//        request.setWeekOption("1,2,3,4,5");
+        TaskRequest request = new TaskRequest();
+        request.setTaskType((byte) 0);
+        request.setTaskName("Input Name for Task");
+        request.setPlayMode((byte) 3);
+        request.setCount((byte) 1);
+        request.setStartTime(LocalDateTime.of(2021, 9, 15, 9, 30, 0));
+        request.setEndTime(LocalDateTime.of(2021, 9, 15, 9, 33, 9));
+        request.setTimeMode((byte) 0);
+        request.setTimeType((byte) 1);
+        request.setWeekOption("1,2,3,4,5,6,7");
 //        request.setIsOpenPowerAmplifierInAdvanceTime(3);
 //        request.setIsOpenPowerAmplifierInAdvance((byte) 1);
-//        request.setPlayContentIdList(Collections.singletonList("0003"));
-//        request.setPlayObjectIdList(Collections.singletonList("FFFFFF01"));
-        String jsonStr = "{\"count\":3,\"endTime\":\"2022-09-30T09:57:20\",\"endTimeHex\":\"16091e093914\",\"isOpenPowerAmplifierInAdvance\":1,\"isOpenPowerAmplifierInAdvanceTime\":3,\"openInAdvanceTimeHex\":\"03\",\"playContent\":\"06000000\",\"playContentIdList\":[\"0006\"],\"playContentLen\":\"02\",\"playMode\":3,\"playObject\":\"01FFFFFF\",\"playObjectIdList\":[\"FFFFFF01\"],\"playObjectLen\":\"01\",\"playWayHex\":\"1b\",\"startTime\":\"2021-09-10T09:55:29\",\"startTimeHex\":\"15090a09371d\",\"taskName\":\"test3\",\"taskNameHex\":\"0574657374330000000000000000000000000000000000000000000000000000\",\"taskType\":0,\"taskTypeHex\":\"00\",\"time\":\"41\",\"timeMode\":0,\"timeType\":1,\"volume\":0,\"volumeHex\":\"00\",\"weekHex\":\"38\",\"weekOption\":\"3,4,5\"}";
-        final TaskRequest request = JSON.parseObject(jsonStr, TaskRequest.class);
+        request.setPlayContentIdList(Collections.singletonList("0001"));
+        request.setPlayObjectIdList(Collections.singletonList("FFFFFF01"));
+//        String jsonStr = "{\"count\":3,\"endTime\":\"2022-09-30T09:57:20\",\"endTimeHex\":\"16091e093914\",\"isOpenPowerAmplifierInAdvance\":1,\"isOpenPowerAmplifierInAdvanceTime\":3,\"openInAdvanceTimeHex\":\"03\",\"playContent\":\"06000000\",\"playContentIdList\":[\"0006\"],\"playContentLen\":\"02\",\"playMode\":3,\"playObject\":\"01FFFFFF\",\"playObjectIdList\":[\"FFFFFF01\"],\"playObjectLen\":\"01\",\"playWayHex\":\"1b\",\"startTime\":\"2021-09-10T09:55:29\",\"startTimeHex\":\"15090a09371d\",\"taskName\":\"test3\",\"taskNameHex\":\"0574657374330000000000000000000000000000000000000000000000000000\",\"taskType\":0,\"taskTypeHex\":\"00\",\"time\":\"41\",\"timeMode\":0,\"timeType\":1,\"volume\":0,\"volumeHex\":\"00\",\"weekHex\":\"38\",\"weekOption\":\"3,4,5\"}";
+//        final TaskRequest request = JSON.parseObject(jsonStr, TaskRequest.class);
         final ZhongHeResult<String> stringZhongHeResult = zhongHeClient.addTimingTask(request);
         System.out.println(stringZhongHeResult.getData());
     }
