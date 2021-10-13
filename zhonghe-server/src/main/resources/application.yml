@@ -10,9 +10,6 @@ spring:
     allow-bean-definition-overriding: true
   profiles:
     active: dev
-  servlet:
-    multipart:
-      max-file-size: 10MB
 
 system:
   zhong-he-config:
@@ -25,4 +22,3 @@ system:
     middle-ware-ip: '192.168.166.153'
   tcp-host: 127.0.0.1
   tcp-port: 9000
-
