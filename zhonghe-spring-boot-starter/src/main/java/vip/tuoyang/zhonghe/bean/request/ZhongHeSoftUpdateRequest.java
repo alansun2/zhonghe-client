@@ -2,9 +2,9 @@ package vip.tuoyang.zhonghe.bean.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.AssertUtils;
+import vip.tuoyang.base.util.StringUtils;
 
 /**
  * @author AlanSun
@@ -32,7 +32,7 @@ public class ZhongHeSoftUpdateRequest {
 
     public void valid() {
         AssertUtils.notBlank(version, "version null error");
-        if (StringUtils.isAllEmpty(nasUrl, manageUrl, middlewareUrl)) {
+        if (StringUtils.isEmpty(nasUrl) && StringUtils.isEmpty(manageUrl) && StringUtils.isEmpty(middlewareUrl)) {
             throw new BizException("三个地址不能都为空");
         }
     }
