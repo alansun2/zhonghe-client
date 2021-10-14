@@ -15,5 +15,12 @@ public class SoftUpdateResponse {
 
     private Integer successCount;
 
-    private List<String> fileResult;
+    private List<FileResult> failResult;
+
+    @Getter
+    @Setter
+    public static class FileResult {
+        private String label;
+        private String errorMsg;
+    }
 }

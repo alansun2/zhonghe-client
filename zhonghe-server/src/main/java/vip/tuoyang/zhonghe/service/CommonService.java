@@ -14,6 +14,7 @@ import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.bean.SoftInfo;
+import vip.tuoyang.zhonghe.bean.request.FileUpdate;
 import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
 import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
@@ -185,5 +186,16 @@ public class CommonService {
         softInfo.setVersion(myselfUpdate.getVersion());
         File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
         FileUtils.writeStringToFile(softInfoPath, JSON.toJSONString(softInfo));
+    }
+
+    /**
+     * 文件更新
+     *
+     * @param fileUpdate {@link FileUpdate}
+     */
+    public void updateFile(FileUpdate fileUpdate) throws IOException {
+        final BroadcastInstallPath broadcastInstallPath = serviceSystemProperties.getBroadcastInstallPath();
+        final String installDir = broadcastInstallPath.getInstallDir();
+        FileUtils.copyURLToFile(new URL(fileUpdate.getFileUrl()), new File(installDir + "/" + fileUpdate.getFileName()));
     }
 }

@@ -1,17 +1,13 @@
 package vip.tuoyang.zhonghe.service;
 
 import io.netty.channel.Channel;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
-import vip.tuoyang.zhonghe.bean.request.FileUploadRequest;
-import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
-import vip.tuoyang.zhonghe.bean.request.Task1Request;
-import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
+import vip.tuoyang.zhonghe.bean.request.*;
 import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.SoftUpdateResponse;
 import vip.tuoyang.zhonghe.bean.response.StateResponse;
@@ -19,10 +15,7 @@ import vip.tuoyang.zhonghe.bean.response.TerminalDataResponse;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 import vip.tuoyang.zhonghe.support.SyncSupport;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -126,7 +119,7 @@ public class ZhongHeSendClient {
     /**
      * 软件更新
      *
-     * @param softUpdateRequest {@link }
+     * @param softUpdateRequest {@link ZhongHeSoftUpdateRequest}
      * @param labels            指定哪些机器需要更新
      * @return {@link SoftUpdateResponse}
      */
@@ -135,7 +128,7 @@ public class ZhongHeSendClient {
         softUpdateRequest.valid();
         SoftUpdateResponse softUpdateResponse = new SoftUpdateResponse();
         AtomicInteger successCount = new AtomicInteger();
-        List<String> failLabels = new ArrayList<>();
+        List<SoftUpdateResponse.FileResult> failLabels = new ArrayList<>();
         labels.forEach(item -> {
             ZhongHeDto<ZhongHeSoftUpdateRequest> zhongHeBaseRequest = new ZhongHeDto<>();
             zhongHeBaseRequest.setCommand((byte) 15);
@@ -144,19 +137,22 @@ public class ZhongHeSendClient {
             if (result.isSuccess()) {
                 successCount.getAndIncrement();
             } else {
-                failLabels.add(item);
+                SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
+                fileResult.setLabel(item);
+                fileResult.setErrorMsg(result.getErrorMsg());
+                failLabels.add(fileResult);
             }
         });
 
         softUpdateResponse.setSuccessCount(successCount.get());
-        softUpdateResponse.setFileResult(failLabels);
+        softUpdateResponse.setFailResult(failLabels);
         return softUpdateResponse;
     }
 
     /**
      * 软件更新
      *
-     * @param myselfUpdate {@link }
+     * @param myselfUpdate {@link MyselfUpdate}
      * @param labels       指定哪些机器需要更新
      * @return {@link SoftUpdateResponse}
      */
@@ -165,7 +161,7 @@ public class ZhongHeSendClient {
         myselfUpdate.valid();
         SoftUpdateResponse softUpdateResponse = new SoftUpdateResponse();
         AtomicInteger successCount = new AtomicInteger();
-        List<String> failLabels = new ArrayList<>();
+        List<SoftUpdateResponse.FileResult> failLabels = new ArrayList<>();
         labels.forEach(item -> {
             ZhongHeDto<MyselfUpdate> zhongHeBaseRequest = new ZhongHeDto<>();
             zhongHeBaseRequest.setCommand((byte) 16);
@@ -174,12 +170,48 @@ public class ZhongHeSendClient {
             if (result.isSuccess()) {
                 successCount.getAndIncrement();
             } else {
-                failLabels.add(item);
+                SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
+                fileResult.setLabel(item);
+                fileResult.setErrorMsg(result.getErrorMsg());
+                failLabels.add(fileResult);
             }
         });
 
         softUpdateResponse.setSuccessCount(successCount.get());
-        softUpdateResponse.setFileResult(failLabels);
+        softUpdateResponse.setFailResult(failLabels);
+        return softUpdateResponse;
+    }
+
+    /**
+     * 文件更新
+     *
+     * @param fileUpdate {@link FileUpdate}
+     * @param labels     指定哪些机器需要更新
+     * @return {@link SoftUpdateResponse}
+     */
+    public SoftUpdateResponse updateFile(List<String> labels, FileUpdate fileUpdate) {
+        AssertUtils.notEmpty(labels, "至少选择一台机器更新");
+        fileUpdate.valid();
+        SoftUpdateResponse softUpdateResponse = new SoftUpdateResponse();
+        AtomicInteger successCount = new AtomicInteger();
+        List<SoftUpdateResponse.FileResult> failLabels = new ArrayList<>();
+        labels.forEach(item -> {
+            ZhongHeDto<FileUpdate> zhongHeBaseRequest = new ZhongHeDto<>();
+            zhongHeBaseRequest.setCommand((byte) 17);
+            zhongHeBaseRequest.setData(fileUpdate);
+            final ZhongHeResult<?> result = getResult(item, zhongHeBaseRequest);
+            if (result.isSuccess()) {
+                successCount.getAndIncrement();
+            } else {
+                SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
+                fileResult.setLabel(item);
+                fileResult.setErrorMsg(result.getErrorMsg());
+                failLabels.add(fileResult);
+            }
+        });
+
+        softUpdateResponse.setSuccessCount(successCount.get());
+        softUpdateResponse.setFailResult(failLabels);
         return softUpdateResponse;
     }
 

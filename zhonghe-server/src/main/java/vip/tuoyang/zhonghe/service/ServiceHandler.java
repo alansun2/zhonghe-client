@@ -13,10 +13,7 @@ import vip.tuoyang.base.constants.SeparatorConstants;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
-import vip.tuoyang.zhonghe.bean.request.FileUploadRequest;
-import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
-import vip.tuoyang.zhonghe.bean.request.Task1Request;
-import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
+import vip.tuoyang.zhonghe.bean.request.*;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
 
 import java.io.File;
@@ -123,6 +120,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                         commonService.update(zhongHeBaseRequest15.getData());
                     } catch (Throwable t) {
                         zhongHeResult.setSuccess(false);
+                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 50));
                     }
                     break;
                 case 16:
@@ -133,6 +131,18 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                         commonService.updateMyself(zhongHeBaseRequest16.getData());
                     } catch (Throwable t) {
                         zhongHeResult.setSuccess(false);
+                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 50));
+                    }
+                    break;
+                case 17:
+                    final ZhongHeDto<FileUpdate> zhongHeBaseRequest17 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<FileUpdate>>() {
+                    });
+                    zhongHeResult = new ZhongHeResult<>();
+                    try {
+                        commonService.updateFile(zhongHeBaseRequest17.getData());
+                    } catch (Throwable t) {
+                        zhongHeResult.setSuccess(false);
+                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 50));
                     }
                     break;
                 default:

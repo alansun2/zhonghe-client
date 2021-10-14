@@ -26,6 +26,9 @@ public class ZhongHeDto<T> {
      * 12: 重启
      * 13: 状态修改
      * 14：服务初始化
+     * 15：中河软件更新
+     * 16：自己更新
+     * 17：文件更新
      */
     private Byte command;
 

@@ -3,7 +3,6 @@ package vip.tuoyang.zhonghe.bean.request;
 import lombok.Getter;
 import lombok.Setter;
 import vip.tuoyang.base.exception.BizException;
-import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.base.util.StringUtils;
 
 /**
@@ -12,20 +11,19 @@ import vip.tuoyang.base.util.StringUtils;
  **/
 @Getter
 @Setter
-public class MyselfUpdate {
+public class FileUpdate {
     /**
      * 自己版本号
      */
-    private String version;
+    private String fileName;
     /**
      * 更新自己的 url
      */
-    private String myselfUrl;
+    private String fileUrl;
 
     public void valid() {
-        AssertUtils.notBlank(version, "version null error");
-        if (StringUtils.isEmpty(myselfUrl)) {
-            throw new BizException("三个地址不能都为空");
+        if (StringUtils.isEmpty(fileName, fileName)) {
+            throw new BizException("参数都不能为空");
         }
     }
 }

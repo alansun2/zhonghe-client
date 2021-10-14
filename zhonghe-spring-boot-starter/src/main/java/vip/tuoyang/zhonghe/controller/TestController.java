@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import vip.tuoyang.zhonghe.bean.ZhongHeResult;
-import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
-import vip.tuoyang.zhonghe.bean.request.SoftUpdate;
-import vip.tuoyang.zhonghe.bean.request.Task1Request;
-import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
+import vip.tuoyang.zhonghe.bean.request.*;
 import vip.tuoyang.zhonghe.bean.response.GroupDataResponse;
 import vip.tuoyang.zhonghe.bean.response.SoftUpdateResponse;
 import vip.tuoyang.zhonghe.bean.response.StateResponse;
@@ -89,12 +86,17 @@ public class TestController {
     }
 
     @PostMapping("update-zhonghe")
-    public SoftUpdateResponse zhongheSoftUpdate(@RequestBody SoftUpdate<ZhongHeSoftUpdateRequest> request) {
+    public SoftUpdateResponse zhongHeSoftUpdate(@RequestBody SoftUpdate<ZhongHeSoftUpdateRequest> request) {
         return zhongHeSendClient.softUpdate(request.getLabels(), request.getSoftUpdateRequest());
     }
 
     @PostMapping("update-myself")
     public SoftUpdateResponse softUpdate(@RequestBody SoftUpdate<MyselfUpdate> request) {
         return zhongHeSendClient.updateMyself(request.getLabels(), request.getSoftUpdateRequest());
+    }
+
+    @PostMapping("update-file")
+    public SoftUpdateResponse updateFile(@RequestBody SoftUpdate<FileUpdate> request) {
+        return zhongHeSendClient.updateFile(request.getLabels(), request.getSoftUpdateRequest());
     }
 }
