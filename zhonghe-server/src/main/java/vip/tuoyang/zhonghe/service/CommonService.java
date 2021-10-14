@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import vip.tuoyang.base.constants.SeparatorConstants;
-import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.bean.SoftInfo;
@@ -75,10 +74,18 @@ public class CommonService {
         this.start(runtime, processPath);
     }
 
+    public void generatorTimer(Runtime runtime) throws IOException {
+        // 生成定时任务
+        runtime.exec("schtasks /Create /SC MINUTE /TN 广播定时检查 /ST 03:05 /ET 23:59 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/schedule-check.bat");
+        runtime.exec("schtasks /Create /SC DAILY /TN 广播定时重启 /ST 01:05 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
+        runtime.exec("schtasks /Create /SC ONSTART /TN 广播自启 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
+    }
+
     /**
      * 软件更新
      */
-    public void update(ZhongHeSoftUpdateRequest softUpdateRequest) {
+    public void update(ZhongHeSoftUpdateRequest softUpdateRequest) throws IOException {
+        log.info("软件更新开始");
         final String version = softUpdateRequest.getVersion();
         AssertUtils.notBlank(version, "version blank error");
         final BroadcastInstallPath broadcastInstallPath = serviceSystemProperties.getBroadcastInstallPath();
@@ -89,7 +96,7 @@ public class CommonService {
             File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
             if (softInfoPath.exists()) {
                 final SoftInfo softInfo = JSON.parseObject(FileUtils.readFileToString(softInfoPath, Charset.defaultCharset().toString()), SoftInfo.class);
-                if (!softInfo.getVersion().equals(version)) {
+                if (StringUtils.isEmpty(softInfo.getVersion()) || !softInfo.getVersion().equals(version)) {
                     this.copy(softInfo, runtime, softUpdateRequest, broadcastInstallPath);
                     startFlag = true;
                 }
@@ -98,28 +105,27 @@ public class CommonService {
                 this.copy(softInfo, runtime, softUpdateRequest, broadcastInstallPath);
                 startFlag = true;
             }
-        } catch (Throwable t) {
-            log.error("更新失败", t);
-            throw new BizException("更新失败");
         } finally {
             if (startFlag) {
-                if (runtime != null) {
-                    try {
-                        this.start(runtime, broadcastInstallPath.getMiddleWarePath());
-                        this.start(runtime, broadcastInstallPath.getNasPath());
-                        taskExecutor.execute(() -> {
-                            LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(100));
-                            zhongHeClient.state();
-                        });
-                    } catch (IOException e) {
-                        log.error("更新失败,重启失败", e);
-                    }
+                try {
+                    this.start(runtime, broadcastInstallPath.getMiddleWarePath());
+                    this.start(runtime, broadcastInstallPath.getNasPath());
+                    this.generatorTimer(runtime);
+                    taskExecutor.execute(() -> {
+                        // 为了连上中间件
+                        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(100));
+                        zhongHeClient.state();
+                    });
+                } catch (IOException e) {
+                    log.error("更新失败,重启失败", e);
                 }
             }
         }
     }
 
     private void copy(SoftInfo softInfo, Runtime runtime, ZhongHeSoftUpdateRequest softUpdateRequest, BroadcastInstallPath broadcastInstallPath) throws IOException {
+        // 删除定时
+        runtime.exec(broadcastInstallPath.getInstallDir() + "/delete-timer.bat");
         this.stop(runtime, 8200);
         this.stop(runtime, 8607);
 
@@ -142,7 +148,8 @@ public class CommonService {
      *
      * @param myselfUpdate {@link MyselfUpdate}
      */
-    public void updateMyself(MyselfUpdate myselfUpdate) {
+    public void updateMyself(MyselfUpdate myselfUpdate) throws IOException {
+        log.info("myself 软件更新开始");
         myselfUpdate.valid();
         final String version = myselfUpdate.getVersion();
 
@@ -154,36 +161,34 @@ public class CommonService {
             File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
             if (softInfoPath.exists()) {
                 final SoftInfo softInfo = JSON.parseObject(FileUtils.readFileToString(softInfoPath, Charset.defaultCharset().toString()), SoftInfo.class);
-                if (!softInfo.getVersion().equals(version)) {
-                    this.downloadMyself(softInfo, myselfUpdate, broadcastInstallPath);
+                if (StringUtils.isEmpty(softInfo.getMyselfVersion()) || !softInfo.getMyselfVersion().equals(version)) {
+                    this.downloadMyself(runtime, softInfo, myselfUpdate, broadcastInstallPath);
                     startFlag = true;
                 }
             } else {
                 SoftInfo softInfo = new SoftInfo();
-                this.downloadMyself(softInfo, myselfUpdate, broadcastInstallPath);
+                this.downloadMyself(runtime, softInfo, myselfUpdate, broadcastInstallPath);
                 startFlag = true;
             }
-        } catch (Throwable t) {
-            log.error("更新失败", t);
-            throw new BizException("更新失败");
         } finally {
             if (startFlag) {
-                if (runtime != null) {
-                    try {
-                        runtime.exec(broadcastInstallPath.getMyselfRestartPath());
-                    } catch (IOException e) {
-                        log.error("更新失败,重启失败", e);
-                    }
+                try {
+                    runtime.exec(broadcastInstallPath.getMyselfRestartPath());
+                } catch (IOException e) {
+                    log.error("更新失败,重启失败", e);
                 }
             }
         }
     }
 
-    private void downloadMyself(SoftInfo softInfo, MyselfUpdate myselfUpdate, BroadcastInstallPath broadcastInstallPath) throws IOException {
+    private void downloadMyself(Runtime runtime, SoftInfo softInfo, MyselfUpdate myselfUpdate, BroadcastInstallPath broadcastInstallPath) throws IOException {
+        // 关闭软件
+        runtime.exec(broadcastInstallPath.getInstallDir() + "/delete-timer.bat");
+
         if (StringUtils.isNotEmpty(myselfUpdate.getMyselfUrl())) {
             FileUtils.copyURLToFile(new URL(myselfUpdate.getMyselfUrl()), new File(broadcastInstallPath.getMyselfPath()));
         }
-        softInfo.setVersion(myselfUpdate.getVersion());
+        softInfo.setMyselfVersion(myselfUpdate.getVersion());
         File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
         FileUtils.writeStringToFile(softInfoPath, JSON.toJSONString(softInfo));
     }
@@ -194,6 +199,7 @@ public class CommonService {
      * @param fileUpdate {@link FileUpdate}
      */
     public void updateFile(FileUpdate fileUpdate) throws IOException {
+        log.info("文件更新开始");
         final BroadcastInstallPath broadcastInstallPath = serviceSystemProperties.getBroadcastInstallPath();
         final String installDir = broadcastInstallPath.getInstallDir();
         FileUtils.copyURLToFile(new URL(fileUpdate.getFileUrl()), new File(installDir + "/" + fileUpdate.getFileName()));

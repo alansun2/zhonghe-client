@@ -46,7 +46,7 @@ public class ServiceSystemProperties {
     /**
      * 广播 nas 和中间件的安装目录, 测试时使用
      */
-    private String installDir = "D:\\project\\jszn\\对接广播\\zhonghe-broadcast";
+    private String installDir = "D:\\project\\jszn\\broadcast\\zhonghe-broadcast";
 
     private BroadcastInstallPath broadcastInstallPath;
 

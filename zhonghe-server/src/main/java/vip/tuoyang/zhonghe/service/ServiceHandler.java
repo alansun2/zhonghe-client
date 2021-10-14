@@ -120,7 +120,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                         commonService.update(zhongHeBaseRequest15.getData());
                     } catch (Throwable t) {
                         zhongHeResult.setSuccess(false);
-                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 50));
+                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 100));
                     }
                     break;
                 case 16:
@@ -131,7 +131,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                         commonService.updateMyself(zhongHeBaseRequest16.getData());
                     } catch (Throwable t) {
                         zhongHeResult.setSuccess(false);
-                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 50));
+                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 100));
                     }
                     break;
                 case 17:
@@ -142,7 +142,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                         commonService.updateFile(zhongHeBaseRequest17.getData());
                     } catch (Throwable t) {
                         zhongHeResult.setSuccess(false);
-                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 50));
+                        zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 100));
                     }
                     break;
                 default:

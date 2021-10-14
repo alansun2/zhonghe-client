@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
+import vip.tuoyang.zhonghe.service.CommonService;
 import vip.tuoyang.zhonghe.service.ZhongHeClient;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ public class ConnectZhongHeMiddleWare implements ApplicationRunner {
     private ServiceSystemProperties serviceSystemProperties;
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
+    @Autowired
+    private CommonService commonService;
 
     /**
      * Callback used to run the bean.
@@ -37,9 +40,7 @@ public class ConnectZhongHeMiddleWare implements ApplicationRunner {
         taskExecutor.execute(() -> zhongHeClient.state());
         if (serviceSystemProperties.isEnableWinTask()) {
             // 生成定时任务
-            Runtime.getRuntime().exec("schtasks /Create /SC MINUTE /TN 广播定时检查 /ST 03:05 /ET 23:59 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/schedule-check.bat");
-            Runtime.getRuntime().exec("schtasks /Create /SC DAILY /TN 广播定时重启 /ST 01:05 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
-            Runtime.getRuntime().exec("schtasks /Create /SC ONSTART /TN 广播自启 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
+            commonService.generatorTimer(Runtime.getRuntime());
         }
     }
 }

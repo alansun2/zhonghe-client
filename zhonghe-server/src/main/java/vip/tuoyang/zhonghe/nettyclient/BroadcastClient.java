@@ -125,7 +125,7 @@ public class BroadcastClient {
             } catch (Throwable t) {
                 group.shutdownGracefully();
                 ThreadUtils.shutdownAndAwaitTermination(executorService);
-                throw new BizException(500, "connects to  fails", t);
+                throw new BizException(500, "设备服务未启动，connects to  fails", t);
             }
         });
     }
