@@ -40,7 +40,7 @@ public class ConnectZhongHeMiddleWare implements ApplicationRunner {
         taskExecutor.execute(() -> zhongHeClient.state());
         if (serviceSystemProperties.isEnableWinTask()) {
             // 生成定时任务
-            commonService.generatorTimer(Runtime.getRuntime());
+            commonService.generatorTimer();
         }
     }
 }

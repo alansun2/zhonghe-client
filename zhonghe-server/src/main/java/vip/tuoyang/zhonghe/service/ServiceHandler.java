@@ -119,6 +119,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     try {
                         commonService.update(zhongHeBaseRequest15.getData());
                     } catch (Throwable t) {
+                        log.error("更新失败", t);
                         zhongHeResult.setSuccess(false);
                         zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 100));
                     }
@@ -130,6 +131,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     try {
                         commonService.updateMyself(zhongHeBaseRequest16.getData());
                     } catch (Throwable t) {
+                        log.error("myself更新失败", t);
                         zhongHeResult.setSuccess(false);
                         zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 100));
                     }
@@ -141,6 +143,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     try {
                         commonService.updateFile(zhongHeBaseRequest17.getData());
                     } catch (Throwable t) {
+                        log.error("更新文件失败", t);
                         zhongHeResult.setSuccess(false);
                         zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 100));
                     }
