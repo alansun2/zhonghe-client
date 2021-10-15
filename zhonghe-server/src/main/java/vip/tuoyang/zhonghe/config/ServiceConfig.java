@@ -64,7 +64,7 @@ public class ServiceConfig {
         broadcastInstallPath.setNasPath(nasPath);
         broadcastInstallPath.setManagePath(managePath);
         broadcastInstallPath.setMyselfPath(myselfPath);
-        broadcastInstallPath.setMyselfRestartPath(installDir + "/jszn-middleware/restart.bat");
+        broadcastInstallPath.setMyselfUpdatePath(installDir + "/jszn-middleware/update.bat");
         broadcastInstallPath.setMyselfStopPath(installDir + "/jszn-middleware/stop.bat");
         serviceSystemProperties.setBroadcastInstallPath(broadcastInstallPath);
     }

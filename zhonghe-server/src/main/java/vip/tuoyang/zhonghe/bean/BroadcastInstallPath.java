@@ -33,7 +33,7 @@ public class BroadcastInstallPath {
     /**
      * 自己的启动文件的路径
      */
-    private String myselfRestartPath;
+    private String myselfUpdatePath;
     /**
      * 自己的启动文件的路径
      */

@@ -22,4 +22,10 @@ public class TT {
         System.out.println(System.currentTimeMillis() - start);
         LockSupport.park();
     }
+
+    @Test
+    public void test1() throws IOException {
+        Runtime.getRuntime().exec("cmd /c start D:\\project\\jszn\\broadcast\\zhonghe-broadcast\\test.bat");
+//        LockSupport.park();
+    }
 }

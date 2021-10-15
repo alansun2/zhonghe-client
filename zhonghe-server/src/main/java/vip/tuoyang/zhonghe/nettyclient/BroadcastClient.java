@@ -12,7 +12,6 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.HashedWheelTimer;
 import lombok.extern.slf4j.Slf4j;
-import vip.tuoyang.base.exception.BizException;
 import vip.tuoyang.base.util.ThreadUtils;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.nettyclient.codec.MyStringEncoder;
@@ -125,7 +124,8 @@ public class BroadcastClient {
             } catch (Throwable t) {
                 group.shutdownGracefully();
                 ThreadUtils.shutdownAndAwaitTermination(executorService);
-                throw new BizException(500, "设备服务未启动，connects to  fails", t);
+                log.error("设备服务未启动，connects to  fails", t);
+                throw new RuntimeException();
             }
         });
     }

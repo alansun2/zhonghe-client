@@ -174,7 +174,7 @@ public class CommonService {
         } finally {
             if (startFlag) {
                 try {
-                    this.exec(broadcastInstallPath.getMyselfRestartPath());
+                    Runtime.getRuntime().exec("cmd /c start " + broadcastInstallPath.getMyselfUpdatePath());
                 } catch (IOException e) {
                     log.error("更新失败,重启失败", e);
                 }
@@ -186,7 +186,8 @@ public class CommonService {
         // 关闭软件
         this.exec(broadcastInstallPath.getInstallDir() + "/delete-timer.bat");
         if (StringUtils.isNotEmpty(myselfUpdate.getMyselfUrl())) {
-            FileUtils.copyURLToFile(new URL(myselfUpdate.getMyselfUrl()), new File(broadcastInstallPath.getMyselfPath()));
+            // 下载文件
+            FileUtils.copyURLToFile(new URL(myselfUpdate.getMyselfUrl()), new File(broadcastInstallPath.getInstallDir() + "/jszn-middleware/zhonghe-server.jar"));
         }
         softInfo.setMyselfVersion(myselfUpdate.getVersion());
         File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
