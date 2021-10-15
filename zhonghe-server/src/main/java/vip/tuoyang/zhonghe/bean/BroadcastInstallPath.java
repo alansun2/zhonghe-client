@@ -23,10 +23,6 @@ public class BroadcastInstallPath {
      */
     private String nasPath;
     /**
-     * 管理软件路径
-     */
-    private String managePath;
-    /**
      * 自己的jar文件的路径
      */
     private String myselfPath;

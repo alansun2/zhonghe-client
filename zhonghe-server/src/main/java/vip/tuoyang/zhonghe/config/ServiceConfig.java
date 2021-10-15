@@ -52,9 +52,6 @@ public class ServiceConfig {
         this.searchFile(files, installDir, "服务器软件", ".exe", "nas");
         String nasPath = files.get(0).getAbsolutePath();
         files.clear();
-        this.searchFile(files, installDir, "管理软件", ".exe", "管理软件");
-        String managePath = files.get(0).getAbsolutePath();
-        files.clear();
         this.searchFile(files, installDir, "zhonghe-server", ".jar", "zhonghe-server");
         String myselfPath = files.get(0).getAbsolutePath();
 
@@ -62,7 +59,6 @@ public class ServiceConfig {
         broadcastInstallPath.setInstallDir(installDir);
         broadcastInstallPath.setMiddleWarePath(middleWarePath);
         broadcastInstallPath.setNasPath(nasPath);
-        broadcastInstallPath.setManagePath(managePath);
         broadcastInstallPath.setMyselfPath(myselfPath);
         broadcastInstallPath.setMyselfUpdatePath(installDir + "/jszn-middleware/update.bat");
         broadcastInstallPath.setMyselfStopPath(installDir + "/jszn-middleware/stop.bat");

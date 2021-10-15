@@ -11,6 +11,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import vip.tuoyang.base.constants.SeparatorConstants;
 import vip.tuoyang.base.util.AssertUtils;
+import vip.tuoyang.base.util.DateUtils;
 import vip.tuoyang.zhonghe.bean.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.bean.SoftInfo;
 import vip.tuoyang.zhonghe.bean.request.FileUpdate;
@@ -24,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -108,6 +111,8 @@ public class CommonService {
                 this.copy(softInfo, softUpdateRequest, broadcastInstallPath);
                 startFlag = true;
             }
+        } catch (Exception e) {
+            this.generatorTimer();
         } finally {
             if (startFlag) {
                 try {
@@ -135,11 +140,15 @@ public class CommonService {
         if (StringUtils.isNotEmpty(softUpdateRequest.getNasUrl())) {
             FileUtils.copyURLToFile(new URL(softUpdateRequest.getNasUrl()), new File(broadcastInstallPath.getNasPath()));
         }
-        if (StringUtils.isNotEmpty(softUpdateRequest.getManageUrl())) {
-            FileUtils.copyURLToFile(new URL(softUpdateRequest.getManageUrl()), new File(broadcastInstallPath.getManagePath()));
-        }
         if (StringUtils.isNotEmpty(softUpdateRequest.getMiddlewareUrl())) {
             FileUtils.copyURLToFile(new URL(softUpdateRequest.getMiddlewareUrl()), new File(broadcastInstallPath.getMiddleWarePath()));
+        }
+        try {
+            if (StringUtils.isNotEmpty(softUpdateRequest.getManageUrl())) {
+                FileUtils.copyURLToFile(new URL(softUpdateRequest.getManageUrl()), new File(broadcastInstallPath.getInstallDir() + "/manage/管理软件-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern(DateUtils.DATE_LONG_FORMAT)) + ".exe"));
+            }
+        } catch (Exception e) {
+            log.error("管理软件更新失败", e);
         }
         softInfo.setVersion(softUpdateRequest.getVersion());
         File softInfoPath = ServiceUtils.getSoftInfoPath(broadcastInstallPath.getInstallDir());
@@ -171,10 +180,12 @@ public class CommonService {
                 this.downloadMyself(softInfo, myselfUpdate, broadcastInstallPath);
                 startFlag = true;
             }
+        } catch (Exception e) {
+            this.generatorTimer();
         } finally {
             if (startFlag) {
                 try {
-                    Runtime.getRuntime().exec("cmd /c start " + broadcastInstallPath.getMyselfUpdatePath());
+                    this.start(broadcastInstallPath.getMyselfUpdatePath());
                 } catch (IOException e) {
                     log.error("更新失败,重启失败", e);
                 }
