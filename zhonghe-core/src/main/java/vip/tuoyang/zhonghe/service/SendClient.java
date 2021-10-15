@@ -103,7 +103,7 @@ public class SendClient {
                     try {
                         countDownLatch2.await();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        log.error("中断", e);
                     } finally {
                         countDownLatch2.reset();
                     }
