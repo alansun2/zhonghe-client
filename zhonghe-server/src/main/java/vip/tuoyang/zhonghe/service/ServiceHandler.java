@@ -92,9 +92,12 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     final String fileUrl = fileUploadRequest8.getFileUrl();
                     AssertUtils.notNull(fileUrl, "文件地址不能为空");
 
-                    String filePath = serviceSystemProperties.getFileDir() + fileName;
-                    FileUtils.copyURLToFile(new URL(fileUrl), new File(filePath));
-                    zhongHeResult = zhongHeClient.uploadMediaFile(filePath);
+                    final String targetFilePath = serviceSystemProperties.getFileDir() + fileName;
+                    File targetFile = new File(targetFilePath);
+                    if (!targetFile.exists()) {
+                        FileUtils.copyURLToFile(new URL(fileUrl), targetFile);
+                    }
+                    zhongHeResult = zhongHeClient.uploadMediaFile(targetFilePath);
                     break;
                 case 9:
                     final ZhongHeDto<FileUploadRequest> zhongHeBaseRequest9 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<FileUploadRequest>>() {
