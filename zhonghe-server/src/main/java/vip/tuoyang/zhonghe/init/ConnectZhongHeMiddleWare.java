@@ -7,7 +7,13 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+import vip.tuoyang.zhonghe.bean.ZhongHeDto;
+import vip.tuoyang.zhonghe.bean.ZhongHeResult;
+import vip.tuoyang.zhonghe.bean.request.StateRequest;
+import vip.tuoyang.zhonghe.bean.response.StateResponse;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
+import vip.tuoyang.zhonghe.constants.StateEnum;
+import vip.tuoyang.zhonghe.nettyclient.BroadcastClient;
 import vip.tuoyang.zhonghe.service.CommonService;
 import vip.tuoyang.zhonghe.service.ZhongHeClient;
 
@@ -29,6 +35,8 @@ public class ConnectZhongHeMiddleWare implements ApplicationRunner {
     private ThreadPoolTaskExecutor taskExecutor;
     @Autowired
     private CommonService commonService;
+    @Autowired
+    private BroadcastClient broadcastClient;
 
     /**
      * Callback used to run the bean.
@@ -37,7 +45,18 @@ public class ConnectZhongHeMiddleWare implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws IOException {
-        taskExecutor.execute(() -> zhongHeClient.state());
+        taskExecutor.execute(() -> {
+            final ZhongHeResult<StateResponse> state = zhongHeClient.state();
+            ZhongHeDto<StateRequest> zhongHeBaseRequest1 = new ZhongHeDto<>();
+            StateRequest stateRequest1 = new StateRequest();
+            stateRequest1.setLabel(serviceSystemProperties.getZhongHeConfig().getLabel());
+            stateRequest1.setState(1);
+            zhongHeBaseRequest1.setCommand((byte) 13);
+            zhongHeBaseRequest1.setData(stateRequest1);
+            if (state.isSuccess() && state.getData().getState().equals(StateEnum.ONLINE_RUNNING)) {
+                broadcastClient.sendMessage(zhongHeBaseRequest1);
+            }
+        });
         if (serviceSystemProperties.isEnableWinTask()) {
             // 生成定时任务
             commonService.generatorTimer();

@@ -14,10 +14,13 @@ import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.base.util.DateUtils;
 import vip.tuoyang.zhonghe.bean.BroadcastInstallPath;
 import vip.tuoyang.zhonghe.bean.SoftInfo;
+import vip.tuoyang.zhonghe.bean.ZhongHeDto;
 import vip.tuoyang.zhonghe.bean.request.FileUpdate;
 import vip.tuoyang.zhonghe.bean.request.MyselfUpdate;
+import vip.tuoyang.zhonghe.bean.request.StateRequest;
 import vip.tuoyang.zhonghe.bean.request.ZhongHeSoftUpdateRequest;
 import vip.tuoyang.zhonghe.config.properties.ServiceSystemProperties;
+import vip.tuoyang.zhonghe.nettyclient.BroadcastClient;
 import vip.tuoyang.zhonghe.utils.ServiceUtils;
 
 import java.io.File;
@@ -46,6 +49,8 @@ public class CommonService {
     private ServiceSystemProperties serviceSystemProperties;
     @Autowired
     private ThreadPoolTaskExecutor taskExecutor;
+    @Autowired
+    private BroadcastClient broadcastClient;
 
     private ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(5);
 
