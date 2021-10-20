@@ -16,13 +16,20 @@ public class SendStateHandler {
         if (resultInternal != null) {
             final CmdEnum cmdEnum = resultInternal.getZhongHeResponse().getCmdEnum();
             if (cmdEnum == CmdEnum.PRO_TIMING_TASK) {
-                resultInternal.setData(zhongHeResponse.getContent().substring(8, 10));
-                SyncResultSupport.getLabelResultCountDown(label).countDown();
+                final String id = zhongHeResponse.getContent().substring(8, 10);
+                // 这里不处理 00, 因为有时候第一个state返回的是 00
+                if (!"00".equals(id)) {
+                    resultInternal.setData(id);
+                    SyncResultSupport.getLabelResultCountDown(label).countDown();
+                }
             } else if (cmdEnum == CmdEnum.UPLOAD_MEDIA_FILE) {
                 final boolean mediaFileUploadComplete = this.isMediaFileUploadComplete();
                 if (mediaFileUploadComplete) {
-                    resultInternal.setData(this.getMediaFileNo());
-                    SyncResultSupport.getLabelResultCountDown(label).countDown();
+                    final String mediaFileNo = this.getMediaFileNo();
+                    if (!"0000".equals(mediaFileNo)) {
+                        resultInternal.setData(mediaFileNo);
+                        SyncResultSupport.getLabelResultCountDown(label).countDown();
+                    }
                 }
             }
         }
