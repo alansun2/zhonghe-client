@@ -128,8 +128,10 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
     private <T> void resultHandle(ZhongHeDto<ZhongHeResult<T>> zhongHeResult) {
         if (zhongHeResult != null) {
             String label = zhongHeResult.getLabel();
-            SyncSupport.labelResultMap.put(label, zhongHeResult.getData());
-            SyncSupport.getCountDownLatch2(label).countDown();
+            if (label != null) {
+                SyncSupport.labelResultMap.put(label, zhongHeResult.getData());
+                SyncSupport.getCountDownLatch2(label).countDown();
+            }
         }
     }
 

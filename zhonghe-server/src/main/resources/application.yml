@@ -13,12 +13,12 @@ spring:
 
 system:
   zhong-he-config:
-    label: '330482098'
+    label: '123456'
     device-id: '00001011'
     device-des: 'Alan测试'
-    device-address: '设备测试学校'
+    device-address: '测试分校1'
     manager-code: '12345668'
     nas-ip: '192.168.166.153'
     middle-ware-ip: '192.168.166.153'
-  tcp-host: 127.0.0.1
-  tcp-port: 9000
+  tcp-host: zhonghe.tuoyang.vip
+  tcp-port: 28085
