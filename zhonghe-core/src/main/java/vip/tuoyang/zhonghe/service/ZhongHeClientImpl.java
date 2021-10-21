@@ -38,20 +38,17 @@ public class ZhongHeClientImpl implements ZhongHeClient {
 
     private final SendClient sendClient;
 
-    private final ZhongHeCallback callback;
-
     private final String label;
 
-    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig, ZhongHeCallback callback, SendClient sendClient, String label) {
+    public ZhongHeClientImpl(ZhongHeConfig zhongHeConfig, SendClient sendClient, String label) {
         zhongHeConfig.valid();
         this.zhongHeConfig = zhongHeConfig;
         this.sendClient = sendClient;
-        this.callback = callback;
         this.label = label;
     }
 
     public static ZhongHeClient create(ZhongHeConfig zhongHeConfig, String label, ZhongHeCallback callback) {
-        return new ZhongHeClientImpl(zhongHeConfig, callback, new SendClient(zhongHeConfig, label, callback), label);
+        return new ZhongHeClientImpl(zhongHeConfig, new SendClient(zhongHeConfig, label, callback), label);
     }
 
     @Override
