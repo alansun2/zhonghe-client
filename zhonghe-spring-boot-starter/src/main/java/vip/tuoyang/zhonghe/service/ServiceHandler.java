@@ -105,6 +105,13 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     CHANNEL_LABEL_MAP.put(ctx, requestZhongHeBaseRequest14.getLabel());
                     if (requestZhongHeBaseRequest14.getData() != null) {
                         serviceZhongHeCallback.serverInit(requestZhongHeBaseRequest14.getData());
+                    } else {
+                        // 重连之后只修改状态
+                        StateRequest stateRequest = new StateRequest();
+                        stateRequest.setLabel(requestZhongHeBaseRequest14.getLabel());
+                        stateRequest.setState(1);
+                        log.info("重连后修改状态, param: [{}]", stateRequest);
+                        serviceZhongHeCallback.stateChange(stateRequest);
                     }
                     break;
                 default:
