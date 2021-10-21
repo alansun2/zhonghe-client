@@ -204,7 +204,7 @@ public class ZhongHeSendClient {
         List<SoftUpdateResponse.FileResult> failLabels = new ArrayList<>();
         request.getLabels().forEach(item -> {
             ZhongHeDto<String> zhongHeBaseRequest = new ZhongHeDto<>();
-            zhongHeBaseRequest.setCommand((byte) 17);
+            zhongHeBaseRequest.setCommand((byte) 18);
             zhongHeBaseRequest.setData(request.getCommand());
             this.updateResultHandle(item, zhongHeBaseRequest, successCount, failLabels);
         });
