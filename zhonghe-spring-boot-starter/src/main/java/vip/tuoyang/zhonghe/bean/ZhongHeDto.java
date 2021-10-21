@@ -29,6 +29,7 @@ public class ZhongHeDto<T> {
      * 15：中河软件更新
      * 16：自己更新
      * 17：文件更新
+     * 18: 发送指令
      */
     private Byte command;
 

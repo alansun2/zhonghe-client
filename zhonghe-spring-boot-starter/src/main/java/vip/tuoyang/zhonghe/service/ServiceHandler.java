@@ -66,6 +66,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                 case 15:
                 case 16:
                 case 17:
+                case 18:
                     ZhongHeDto<ZhongHeResult<Object>> zhongHeResult = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<ZhongHeResult<Object>>>() {
                     });
                     this.resultHandle(zhongHeResult);

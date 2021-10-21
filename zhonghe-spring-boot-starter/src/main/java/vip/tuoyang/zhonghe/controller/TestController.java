@@ -1,6 +1,7 @@
 package vip.tuoyang.zhonghe.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,5 +99,10 @@ public class TestController {
     @PostMapping("update-file")
     public SoftUpdateResponse updateFile(@RequestBody SoftUpdate<FileUpdate> request) {
         return zhongHeSendClient.updateFile(request.getLabels(), request.getSoftUpdateRequest());
+    }
+
+    @PostMapping("exec-command")
+    public SoftUpdateResponse execCommand(@Validated @RequestBody CommandRequest request) {
+        return zhongHeSendClient.execCommand(request);
     }
 }

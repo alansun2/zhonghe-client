@@ -192,6 +192,28 @@ public class ZhongHeSendClient {
         return softUpdateResponse;
     }
 
+    /**
+     * 发送指令
+     *
+     * @param request {@link CommandRequest}
+     * @return {@link SoftUpdateResponse}
+     */
+    public SoftUpdateResponse execCommand(CommandRequest request) {
+        SoftUpdateResponse softUpdateResponse = new SoftUpdateResponse();
+        AtomicInteger successCount = new AtomicInteger();
+        List<SoftUpdateResponse.FileResult> failLabels = new ArrayList<>();
+        request.getLabels().forEach(item -> {
+            ZhongHeDto<String> zhongHeBaseRequest = new ZhongHeDto<>();
+            zhongHeBaseRequest.setCommand((byte) 17);
+            zhongHeBaseRequest.setData(request.getCommand());
+            this.updateResultHandle(item, zhongHeBaseRequest, successCount, failLabels);
+        });
+
+        softUpdateResponse.setSuccessCount(successCount.get());
+        softUpdateResponse.setFailResult(failLabels);
+        return softUpdateResponse;
+    }
+
     private ZhongHeResult<?> getResult(String label, ZhongHeDto<?> zhongHeBaseRequest) {
         getChannel(label).writeAndFlush(zhongHeBaseRequest);
         try {
