@@ -1,6 +1,7 @@
 package vip.tuoyang.zhonghe.service;
 
 import io.netty.channel.Channel;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vip.tuoyang.base.exception.BizException;
@@ -133,15 +134,7 @@ public class ZhongHeSendClient {
             ZhongHeDto<ZhongHeSoftUpdateRequest> zhongHeBaseRequest = new ZhongHeDto<>();
             zhongHeBaseRequest.setCommand((byte) 15);
             zhongHeBaseRequest.setData(softUpdateRequest);
-            final ZhongHeResult<?> result = getResult(item, zhongHeBaseRequest);
-            if (result.isSuccess()) {
-                successCount.getAndIncrement();
-            } else {
-                SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
-                fileResult.setLabel(item);
-                fileResult.setErrorMsg(result.getErrorMsg());
-                failLabels.add(fileResult);
-            }
+            this.updateResultHandle(item, zhongHeBaseRequest, successCount, failLabels);
         });
 
         softUpdateResponse.setSuccessCount(successCount.get());
@@ -166,15 +159,7 @@ public class ZhongHeSendClient {
             ZhongHeDto<MyselfUpdate> zhongHeBaseRequest = new ZhongHeDto<>();
             zhongHeBaseRequest.setCommand((byte) 16);
             zhongHeBaseRequest.setData(myselfUpdate);
-            final ZhongHeResult<?> result = getResult(item, zhongHeBaseRequest);
-            if (result.isSuccess()) {
-                successCount.getAndIncrement();
-            } else {
-                SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
-                fileResult.setLabel(item);
-                fileResult.setErrorMsg(result.getErrorMsg());
-                failLabels.add(fileResult);
-            }
+            this.updateResultHandle(item, zhongHeBaseRequest, successCount, failLabels);
         });
 
         softUpdateResponse.setSuccessCount(successCount.get());
@@ -199,15 +184,7 @@ public class ZhongHeSendClient {
             ZhongHeDto<FileUpdate> zhongHeBaseRequest = new ZhongHeDto<>();
             zhongHeBaseRequest.setCommand((byte) 17);
             zhongHeBaseRequest.setData(fileUpdate);
-            final ZhongHeResult<?> result = getResult(item, zhongHeBaseRequest);
-            if (result.isSuccess()) {
-                successCount.getAndIncrement();
-            } else {
-                SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
-                fileResult.setLabel(item);
-                fileResult.setErrorMsg(result.getErrorMsg());
-                failLabels.add(fileResult);
-            }
+            this.updateResultHandle(item, zhongHeBaseRequest, successCount, failLabels);
         });
 
         softUpdateResponse.setSuccessCount(successCount.get());
@@ -230,5 +207,24 @@ public class ZhongHeSendClient {
         AssertUtils.notNull(channel, "中间件未启动");
         AssertUtils.isTrue(channel.isActive(), "连接已断开，请稍后重试");
         return channel;
+    }
+
+    private <T> void updateResultHandle(String item, ZhongHeDto<T> zhongHeBaseRequest, AtomicInteger successCount, List<SoftUpdateResponse.FileResult> failLabels) {
+        try {
+            final ZhongHeResult<?> result = getResult(item, zhongHeBaseRequest);
+            if (result.isSuccess()) {
+                successCount.getAndIncrement();
+            } else {
+                SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
+                fileResult.setLabel(item);
+                fileResult.setErrorMsg(result.getErrorMsg());
+                failLabels.add(fileResult);
+            }
+        } catch (Exception e) {
+            SoftUpdateResponse.FileResult fileResult = new SoftUpdateResponse.FileResult();
+            fileResult.setLabel(item);
+            fileResult.setErrorMsg(StringUtils.substring(e.getMessage(), 0, 400));
+            failLabels.add(fileResult);
+        }
     }
 }
