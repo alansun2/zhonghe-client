@@ -60,8 +60,6 @@ public class ConnectZhongHeMiddleWare implements ApplicationRunner {
         if (serviceSystemProperties.isEnableWinTask()) {
             // 生成定时任务
             commonService.generatorTimer();
-            Runtime.getRuntime().exec("SCHTASKS /delete /F /TN broadcast-check");
-            Runtime.getRuntime().exec("SCHTASKS /delete /F /TN broadcast-timer-reboot");
         }
     }
 }
