@@ -37,7 +37,7 @@ public class ZhongHeConfiguration {
     }
 
     @Bean
-    public ServiceHandler broadcastHandler() {
+    public ServiceHandler serviceHandler() {
         return new ServiceHandler();
     }
 
@@ -64,7 +64,7 @@ public class ZhongHeConfiguration {
 
     @Bean
     public BroadcastClient broadcastClient() {
-        BroadcastClient broadcastClient = new BroadcastClient(this.broadcastHandler(), zhongHeDtoEncoder(), myServiceCallback(), serviceSystemProperties.getTcpPort(), serviceSystemProperties.getTcpHost());
+        BroadcastClient broadcastClient = new BroadcastClient(this.serviceHandler(), zhongHeDtoEncoder(), myServiceCallback(), serviceSystemProperties.getTcpPort(), serviceSystemProperties.getTcpHost());
         broadcastClient.connect();
         broadcastClient.sendMessage("token:" + serviceSystemProperties.getSecret());
         ZhongHeDto<ZhongHeConfig> zhongHeBaseRequest = new ZhongHeDto<>();

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import vip.tuoyang.base.constants.SeparatorConstants;
 import vip.tuoyang.base.util.AssertUtils;
 import vip.tuoyang.zhonghe.bean.ZhongHeDto;
@@ -28,6 +29,7 @@ import java.net.URL;
 public class ServiceHandler extends SimpleChannelInboundHandler<String> {
     @Autowired
     private ObjectMapper objectMapper;
+    @Lazy
     @Autowired
     private ZhongHeClient zhongHeClient;
     @Autowired

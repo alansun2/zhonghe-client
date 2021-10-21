@@ -35,7 +35,7 @@ public class BroadcastClient {
 
     private final ConnectorIdleStateTrigger idleStateTrigger = new ConnectorIdleStateTrigger();
 
-    private final ServiceHandler broadcastHandler;
+    private final ServiceHandler serviceHandler;
 
     private final ZhongHeDtoEncoder zhongHeDtoEncoder;
 
@@ -55,8 +55,8 @@ public class BroadcastClient {
 
     private final CountDownLatch2 countDownLatch2 = new CountDownLatch2(1);
 
-    public BroadcastClient(ServiceHandler broadcastHandler, ZhongHeDtoEncoder zhongHeDtoEncoder, MyServiceCallback myServiceCallback, int port, String host) {
-        this.broadcastHandler = broadcastHandler;
+    public BroadcastClient(ServiceHandler serviceHandler, ZhongHeDtoEncoder zhongHeDtoEncoder, MyServiceCallback myServiceCallback, int port, String host) {
+        this.serviceHandler = serviceHandler;
         this.zhongHeDtoEncoder = zhongHeDtoEncoder;
         this.myServiceCallback = myServiceCallback;
         this.port = port;
@@ -92,7 +92,7 @@ public class BroadcastClient {
                             new MyStringEncoder(),
                             zhongHeDtoEncoder,
                             idleStateTrigger,
-                            broadcastHandler
+                            serviceHandler
                     };
                 }
             };
