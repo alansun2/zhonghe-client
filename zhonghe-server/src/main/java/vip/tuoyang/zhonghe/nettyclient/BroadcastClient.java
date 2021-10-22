@@ -130,7 +130,7 @@ public class BroadcastClient {
         });
     }
 
-    public <T> void sendMessage(ZhongHeDto<T> zhongHeDto) {
+    public synchronized <T> void sendMessage(ZhongHeDto<T> zhongHeDto) {
         try {
             countDownLatch2.await();
         } catch (InterruptedException e) {
@@ -139,7 +139,7 @@ public class BroadcastClient {
         channel.writeAndFlush(zhongHeDto);
     }
 
-    public void sendMessage(String msg) {
+    public synchronized void sendMessage(String msg) {
         try {
             countDownLatch2.await();
         } catch (InterruptedException e) {
