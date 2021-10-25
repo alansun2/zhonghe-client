@@ -1,6 +1,7 @@
 package vip.tuoyang.zhonghe.service;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -225,8 +226,10 @@ public class ZhongHeSendClient {
     }
 
     private Channel getChannel(String label) {
-        final Channel channel = ServiceHandler.LABEL_CHANNEL_MAP.get(label);
-        AssertUtils.notNull(channel, "中间件未启动");
+        final ChannelHandlerContext channelHandlerContext = ServiceHandler.LABEL_CHANNEL_MAP.get(label);
+
+        AssertUtils.notNull(channelHandlerContext, "中间件未启动");
+        final Channel channel = channelHandlerContext.channel();
         AssertUtils.isTrue(channel.isActive(), "连接已断开，请稍后重试");
         return channel;
     }
