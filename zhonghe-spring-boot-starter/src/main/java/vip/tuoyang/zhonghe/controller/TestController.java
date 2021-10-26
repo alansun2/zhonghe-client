@@ -105,4 +105,12 @@ public class TestController {
     public SoftUpdateResponse execCommand(@Validated @RequestBody CommandRequest request) {
         return zhongHeSendClient.execCommand(request);
     }
+
+    /**
+     * 用于判断线上代码是否更新
+     */
+    @PostMapping("version")
+    public String execCommand() {
+        return "4.0.0";
+    }
 }
