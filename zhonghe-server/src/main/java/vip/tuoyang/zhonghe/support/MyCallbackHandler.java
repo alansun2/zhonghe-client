@@ -51,7 +51,7 @@ public class MyCallbackHandler implements ZhongHeCallback {
     public synchronized void callback(String label, SendStateHandler stateHandler) {
         final int state = stateHandler.isOnline().equals(StateEnum.ONLINE_RUNNING) ? 1 : 0;
         log.info("服务状态变更，state: [{}]", state);
-        if (lastState == null || !lastState.equals(state)) {
+        if (lastState == null || lastState == 1 || !lastState.equals(state)) {
             if (state == 0 && lastOfflineTime != null && lastOfflineTime + 5000 > System.currentTimeMillis()) {
                 log.info("0 抑制");
                 return;
