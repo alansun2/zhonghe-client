@@ -103,6 +103,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
                     });
                     final ChannelHandlerContext oldCtx = LABEL_CHANNEL_MAP.get(requestZhongHeBaseRequest14.getLabel());
                     if (oldCtx != null) {
+                        log.info("关闭已存在的连接, label: [{}]", requestZhongHeBaseRequest14.getLabel());
                         // 如果已经存在连接则甘比并清除
                         CHANNEL_LABEL_MAP.remove(oldCtx);
                         oldCtx.close();
@@ -157,7 +158,7 @@ public class ServiceHandler extends SimpleChannelInboundHandler<String> {
         }
 
         ctx.close();
-        
+
         final boolean b = CHANNEL_LABEL_MAP.containsKey(ctx);
         if (b) {
             // 断开连接之后通知修改状态
