@@ -50,7 +50,7 @@ public class ZhongHeClientLockProxy implements InvocationHandler {
         }
     }
 
-    public static ZhongHeClient getProxy(ZhongHeClient zhongTaiClient, String label) {
+    public static ZhongHeClient getProxy(ZhongHeClient zhongTaiClient) {
         return (ZhongHeClient) Proxy.newProxyInstance(zhongTaiClient.getClass().getClassLoader(), zhongTaiClient.getClass().getInterfaces(), new ZhongHeClientLockProxy(zhongTaiClient));
     }
 }

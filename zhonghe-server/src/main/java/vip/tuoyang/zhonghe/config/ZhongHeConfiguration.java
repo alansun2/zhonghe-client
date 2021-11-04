@@ -59,7 +59,7 @@ public class ZhongHeConfiguration {
     @Bean
     public ZhongHeClient zhongHeClient() {
         final String label = serviceSystemProperties.getZhongHeConfig().getLabel();
-        return ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(serviceSystemProperties.getZhongHeConfig(), label, zhongHeCallback()), label);
+        return ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(serviceSystemProperties.getZhongHeConfig(), label, zhongHeCallback()));
     }
 
     @Bean

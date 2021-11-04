@@ -36,7 +36,7 @@ public class ZhongHeConnectionManager {
      */
     public void initConnection(Map<String, ZhongHeConfig> labelConfigMap) {
         labelConfigMap.forEach((label, zhongHeConfig) -> {
-            labelClientMap.put(label, ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig, label, stateCallback), label));
+            labelClientMap.put(label, ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig, label, stateCallback)));
         });
 
         SyncResultSupport.initCountDown(labelConfigMap.keySet());
@@ -53,7 +53,7 @@ public class ZhongHeConnectionManager {
             labelClientMap.remove(label);
         }
 
-        final ZhongHeClient proxy = ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig, label, stateCallback), label);
+        final ZhongHeClient proxy = ZhongHeClientLockProxy.getProxy(ZhongHeClientImpl.create(zhongHeConfig, label, stateCallback));
         labelClientMap.put(label, proxy);
         THREAD_POOL_EXECUTOR.execute(proxy::state);
     }
