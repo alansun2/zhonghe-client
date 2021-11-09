@@ -33,7 +33,7 @@ public class ObjectMapperConfig {
                     objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                     JavaTimeModule javaTimeModule = new JavaTimeModule();
                     javaTimeModule.addSerializer(LocalDate.class, new JacksonCustomLocalDateSerializer());
-                    javaTimeModule.addDeserializer(LocalDate.class, new JacksonCustomLocalDateDeserializer());
+                    javaTimeModule.addDeserializer(LocalDate.class, new JacksonCustomLocalDateDeserializer(DateTimeFormatter.ofPattern(DateUtils.DATE_DAY_FORMAT)));
                     javaTimeModule.addSerializer(LocalDateTime.class, new JacksonCustomLocalDateTimeSerializer());
                     javaTimeModule.addDeserializer(LocalDateTime.class, new JacksonCustomLocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DateUtils.DATE_FORMAT)));
                     objectMapper.registerModule(javaTimeModule);
