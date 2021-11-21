@@ -84,9 +84,9 @@ public class CommonService {
 
     public void generatorTimer() throws IOException {
         // 生成定时任务
-        this.exec("schtasks /Create /SC MINUTE /TN broadcast-check-regularly /ST 03:05 /ET 23:59 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/schedule-check.bat");
-        this.exec("schtasks /Create /SC DAILY /TN broadcast-reboot-regularly /ST 01:05 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
-        this.exec("schtasks /Create /SC ONSTART /TN broadcast-reboot /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat");
+        this.exec("schtasks /Create /SC HOURLY /TN broadcast-check-regularly /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/schedule-check.bat /F");
+        this.exec("schtasks /Create /SC WEEKLY /TN broadcast-reboot-regularly /D SAT /ST 03:05 /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/reboot.bat /F");
+        this.exec("schtasks /Create /SC ONSTART /TN broadcast-reboot /TR " + serviceSystemProperties.getBroadcastInstallPath().getInstallDir() + "/restart.bat /F");
     }
 
     /**
