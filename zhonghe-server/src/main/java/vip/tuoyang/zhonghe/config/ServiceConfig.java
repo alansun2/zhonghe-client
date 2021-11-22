@@ -49,7 +49,7 @@ public class ServiceConfig {
         this.searchFile(files, installDir, "MiddleWare", ".exe", "中间件");
         String middleWarePath = files.get(0).getAbsolutePath();
         files.clear();
-        this.searchFile(files, installDir, "服务器软件", ".exe", "nas");
+        this.searchFile(files, installDir, "server", ".exe", "nas");
         String nasPath = files.get(0).getAbsolutePath();
         files.clear();
         this.searchFile(files, installDir, "zhonghe-server", ".jar", "zhonghe-server");
