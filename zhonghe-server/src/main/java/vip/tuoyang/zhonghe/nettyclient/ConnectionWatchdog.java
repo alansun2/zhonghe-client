@@ -80,7 +80,7 @@ public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter im
      */
     private int getTimeOut() {
         if (curAttempts <= MAX_ATTEMPTS) {
-            return 2 << curAttempts;
+            return curAttempts;
         } else {
             return 60000;
         }
