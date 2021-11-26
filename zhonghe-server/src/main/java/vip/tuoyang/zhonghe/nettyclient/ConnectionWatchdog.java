@@ -70,7 +70,7 @@ public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter im
         } else {
             log.info("链接关闭, 不重连");
         }
-        ctx.fireChannelInactive();
+        ctx.close();
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class ConnectionWatchdog extends ChannelInboundHandlerAdapter im
      */
     private int getTimeOut() {
         if (curAttempts <= MAX_ATTEMPTS) {
-            return curAttempts;
+            return 100;
         } else {
             return 60000;
         }
