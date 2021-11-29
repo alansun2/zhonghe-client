@@ -90,7 +90,7 @@
 
         <repository>
             <id>nexus</id>
-            <url>http://183.249.230.208:5086/repository/maven-public/</url>
+            <url>https://nexus.tuoyang.vip:5086/repository/maven-public/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -104,13 +104,13 @@
         <repository>
             <id>nexus</id>
             <name>nexus-release</name>
-            <url>http://183.249.230.208:5086/repository/maven-releases/</url>
+            <url>https://nexus.tuoyang.vip:5086/repository/maven-releases/</url>
         </repository>
 
         <snapshotRepository>
             <id>nexus</id>
             <name>nexus-snapshot</name>
-            <url>http://183.249.230.208:5086/repository/maven-snapshots/</url>
+            <url>https://nexus.tuoyang.vip:5086/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
