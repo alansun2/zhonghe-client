@@ -2,6 +2,7 @@ package vip.tuoyang.zhonghe.nettyserver;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import vip.tuoyang.base.constants.SeparatorConstants;
 import vip.tuoyang.base.exception.BizException;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,7 +27,8 @@ public class InterceptorHandler extends SimpleChannelInboundHandler<String> {
     /**
      * 当链接建立后30秒内必须发送初始化数据，否则视该连接未非法连接，并关闭
      */
-    final Cache<ChannelHandlerContext, ChannelHandlerContext> connectValidCheck = Caffeine.newBuilder()
+    private final Cache<ChannelHandlerContext, ChannelHandlerContext> connectValidCheck = Caffeine.newBuilder()
+            .scheduler(Scheduler.forScheduledExecutorService(new ScheduledThreadPoolExecutor(4)))
             .expireAfterWrite(30, TimeUnit.SECONDS)
             .<ChannelHandlerContext, ChannelHandlerContext>removalListener((key, value, cause) -> {
                 if (cause.wasEvicted()) {
